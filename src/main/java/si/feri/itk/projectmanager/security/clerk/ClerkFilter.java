@@ -16,6 +16,10 @@ import org.jose4j.base64url.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
+import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
+import si.feri.itk.projectmanager.exceptions.implementation.UnauthorizedException;
+import si.feri.itk.projectmanager.security.SecurityConstants;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -44,7 +48,7 @@ public class ClerkFilter extends OncePerRequestFilter {
         }
 
         if (sessionCookie == null) {
-            //TODO throw new exception
+            new BadRequestException("Session cookie not found");
         }
 
         try {
@@ -59,10 +63,14 @@ public class ClerkFilter extends OncePerRequestFilter {
             Map<String, Object> payload = jwt.getPayload();
             String sessionId = payload.get(ClerkConstants.CLERK_PAYLOAD_SESSION_ID).toString();
             String userId = payload.get(ClerkConstants.CLERK_PAYLOAD_USER_ID).toString();
+            request.setAttribute(SecurityConstants.SESSION_ID, sessionId);
+            request.setAttribute(SecurityConstants.USER_ID, userId);
         } catch (ExpiredJwtException ex) {
             log.error("Token expired" + ex.getLocalizedMessage(), ex);
+            throw new UnauthorizedException("Token expired" + ex.getLocalizedMessage(), ex);
         } catch (Exception e) {
             log.error("Error while verifying token" + e.getLocalizedMessage(), e);
+            throw new InternalServerException("Error while verifying token" + e.getLocalizedMessage(), e);
         }
 
         filterChain.doFilter(request, response);
