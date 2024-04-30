@@ -17,6 +17,7 @@ import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,7 +26,7 @@ public class TaskService {
     private final TaskRepo taskRepo;
     private final WorkPackageRepo workPackageRepo;
     private final ProjectRepo projectRepo;
-    public void createTask(CreateTaskRequest request, HttpServletRequest servletRequest) {
+    public UUID createTask(CreateTaskRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserId(servletRequest);
         if (StringUtil.isNullOrEmpty(userId)) {
             log.warn("Unauthorized user tried to create a project");
@@ -73,6 +74,6 @@ public class TaskService {
         task.setEndDate(request.getEndDate());
         task.setWorkPackageId(request.getWorkPackageId());
         task.setIsRelevant(request.getIsRelevant());
-        taskRepo.save(task);
+        return taskRepo.save(task).getId();
     }
 }

@@ -15,6 +15,7 @@ import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class WorkPackageService {
     private final WorkPackageRepo workPackageRepo;
     private final ProjectRepo projectRepo;
-    public void crateWorkPackage(HttpServletRequest servletRequest, CreateWorkPackageRequest request) {
+    public UUID crateWorkPackage(HttpServletRequest servletRequest, CreateWorkPackageRequest request) {
         String userId = RequestUtil.getUserId(servletRequest);
         if (StringUtil.isNullOrEmpty(userId)) {
             log.warn("Unauthorized user tried to create a project");
@@ -66,6 +67,6 @@ public class WorkPackageService {
         workPackage.setIsRelevant(request.getIsRelevant());
         workPackage.setEndDate(request.getEndDate());
         workPackage.setProjectId(project.get().getId());
-        workPackageRepo.save(workPackage);
+        return workPackageRepo.save(workPackage).getId();
     }
 }

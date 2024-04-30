@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.request.CreateWorkPackageRequest;
+import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.service.WorkPackageService;
+
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -18,9 +21,12 @@ import si.feri.itk.projectmanager.service.WorkPackageService;
 public class WorkPackageController {
     private final WorkPackageService workPackageService;
     @PostMapping
-    public void createWorkPackage(@RequestBody CreateWorkPackageRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        workPackageService.crateWorkPackage(servletRequest, request);
+    public ResourceCreatedResponse createWorkPackage(@RequestBody CreateWorkPackageRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        UUID workPackageId = workPackageService.crateWorkPackage(servletRequest, request);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
+        ResourceCreatedResponse response = new ResourceCreatedResponse();
+        response.setId(workPackageId);
+        return response;
     }
 
 }
