@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
+import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.service.TaskService;
+
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -18,8 +21,12 @@ import si.feri.itk.projectmanager.service.TaskService;
 public class TaskController {
     private final TaskService taskService;
     @PostMapping
-    public void createTask(@RequestBody CreateTaskRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        taskService.createTask(request, servletRequest);
+    public ResourceCreatedResponse createTask(@RequestBody CreateTaskRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        UUID taksId = taskService.createTask(request, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
+
+        ResourceCreatedResponse response = new ResourceCreatedResponse();
+        response.setId(taksId);
+        return response;
     }
 }

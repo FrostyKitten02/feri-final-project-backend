@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepo projectRepo;
-    public void createProject(CreateProjectRequest request, HttpServletRequest servletRequest) {
+    public UUID createProject(CreateProjectRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserId(servletRequest);
         if (StringUtil.isNullOrEmpty(userId)) {
             log.warn("Unauthorized user tried to create a project");
@@ -53,7 +53,7 @@ public class ProjectService {
         project.setStartDate(request.getStartDate());
         project.setEndDate(request.getEndDate());
         project.setOwnerId(userId);
-        projectRepo.save(project);
+        return projectRepo.save(project).getId();
     }
 
     public ProjectDto getProjectById(UUID projectId, HttpServletRequest servletRequest) {
