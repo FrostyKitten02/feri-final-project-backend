@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -28,11 +28,19 @@ import java.util.UUID;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public class BaseModel extends AuditModel {
     @Id
-    @UuidGenerator
+    //@UuidGenerator
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
     @Version
     private Integer version;
+
+    //we don't use @UuidGenerator so we can set id manually if we need to
+    @PrePersist
+    public void ensureId() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {
