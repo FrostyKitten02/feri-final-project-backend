@@ -10,12 +10,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import si.feri.itk.projectmanager.dto.model.PersonDto;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
+import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
+import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
+import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
 
+import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin
@@ -24,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectService projectService;
+    private final PersonService personService;
     @PostMapping
     public ResourceCreatedResponse createProject(@RequestBody CreateProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
         UUID project = projectService.createProject(request, servletRequest);
@@ -39,6 +45,21 @@ public class ProjectController {
 
         GetProjectResponse response = new GetProjectResponse();
         response.setProjectDto(project);
+        return response;
+    }
+
+    @PostMapping("{projectId}/add-person-to-project/")
+    public void addPersonToProject(@PathVariable UUID projectId, @RequestBody AddPersonToProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+        projectService.addPersonToProject(projectId, request, servletRequest);
+        servletResponse.setStatus(HttpServletResponse.SC_CREATED);
+    }
+
+    @GetMapping("/{projectId}/people")
+    public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
+        List<PersonDto> people = personService.findPeopleOnProject(projectId);
+        GetPeopleResponse response = new GetPeopleResponse();
+        response.setPeople(people);
+        response.setProjectId(projectId);
         return response;
     }
 

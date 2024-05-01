@@ -22,11 +22,11 @@ public class TaskController {
     private final TaskService taskService;
     @PostMapping
     public ResourceCreatedResponse createTask(@RequestBody CreateTaskRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        UUID taksId = taskService.createTask(request, servletRequest);
+        UUID taskId = taskService.createTask(request, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
 
         ResourceCreatedResponse response = new ResourceCreatedResponse();
-        response.setId(taksId);
+        response.setId(taskId);
         return response;
     }
 }
