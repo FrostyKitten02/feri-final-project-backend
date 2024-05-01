@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +30,17 @@ public class BaseModel extends AuditModel {
     @Id
     //@UuidGenerator
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id = UUID.randomUUID();
+    private UUID id;
     @Version
     private Integer version;
+
+    //we don't use @UuidGenerator so we can set id manually if we need to
+    @PrePersist
+    public void ensureId() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

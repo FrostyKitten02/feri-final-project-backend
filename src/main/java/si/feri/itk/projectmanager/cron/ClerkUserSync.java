@@ -72,7 +72,8 @@ public class ClerkUserSync {
                         }
                     } catch (Exception e) {
                         //this should only happen in dev and test environment, if at all
-                        log.error("Failed to find person with id: " + user.getExternalId());
+                        log.error("Failed to add user with id: " + user.getExternalId());
+                        log.error(e.getLocalizedMessage(), e);
                     }
                 }
                 continue;
