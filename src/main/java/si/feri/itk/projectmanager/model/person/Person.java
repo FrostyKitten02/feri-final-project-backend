@@ -1,8 +1,10 @@
-package si.feri.itk.projectmanager.model;
+package si.feri.itk.projectmanager.model.person;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
+import si.feri.itk.projectmanager.model.BaseModel;
+
 @Entity
 @Getter
 @Setter
