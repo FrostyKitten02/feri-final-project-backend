@@ -18,7 +18,7 @@ import java.util.List;
 @Setter
 public class Project extends BaseModel {
     private String title;
-    private String ownerId;
+    private String ownerId;//clerk id
     private LocalDate startDate;
     private LocalDate endDate;
     @OneToMany(mappedBy = "projectId")

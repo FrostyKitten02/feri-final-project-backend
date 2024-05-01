@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
+import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
@@ -40,6 +41,12 @@ public class ProjectController {
         GetProjectResponse response = new GetProjectResponse();
         response.setProjectDto(project);
         return response;
+    }
+
+    @PostMapping("{projectId}/add-person-to-project/")
+    public void addPersonToProject(@PathVariable UUID projectId, @RequestBody AddPersonToProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+        projectService.addPersonToProject(projectId, request, servletRequest);
+        servletResponse.setStatus(HttpServletResponse.SC_CREATED);
     }
 
 }
