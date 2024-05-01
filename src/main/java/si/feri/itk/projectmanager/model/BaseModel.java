@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -28,9 +27,9 @@ import java.util.UUID;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public class BaseModel extends AuditModel {
     @Id
-    @UuidGenerator
+    //@UuidGenerator
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private UUID id = UUID.randomUUID();
     @Version
     private Integer version;
 

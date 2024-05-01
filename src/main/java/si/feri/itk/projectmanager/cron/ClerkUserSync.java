@@ -67,6 +67,7 @@ public class ClerkUserSync {
                         Optional<Person> person = personRepo.findById(UUID.fromString(user.getExternalId()));
                         if (person.isEmpty()) {
                             Person newPerson = createPersonFromUser(user);
+                            newPerson.setId(UUID.fromString(user.getExternalId()));
                             personRepo.save(newPerson);
                         }
                     } catch (Exception e) {
