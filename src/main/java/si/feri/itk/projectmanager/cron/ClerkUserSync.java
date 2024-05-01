@@ -60,7 +60,7 @@ public class ClerkUserSync {
         UserService userService = clerkClient.getUserService();
         for (User user : users) {
             if (!StringUtil.isNullOrEmpty(user.getExternalId())) {
-                //we don't update our persons with external data
+                //we don't update our person with external data
                 //we could probably skip users after we find one with external id because we order by created_at
                 if (syncLocal) {
                     try {
