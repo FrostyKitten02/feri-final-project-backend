@@ -2,10 +2,12 @@ package si.feri.itk.projectmanager.cron;
 
 import io.github.zzhorizonzz.client.models.EmailAddress;
 import io.github.zzhorizonzz.client.models.User;
+import io.github.zzhorizonzz.client.users.item.WithUserPatchRequestBody;
 import io.github.zzhorizonzz.sdk.ClerkClient;
 import io.github.zzhorizonzz.sdk.user.UserService;
 import io.github.zzhorizonzz.sdk.user.request.ListAllUsersRequest;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,16 +15,23 @@ import si.feri.itk.projectmanager.model.Person;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.util.StringUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ClerkUserSync {
     private final ClerkClient clerkClient;
     private final PersonRepo personRepo;
+    private final boolean syncLocal;
+
+    public ClerkUserSync(ClerkClient clerkClient, PersonRepo personRepo, @Value("${clerk.sync-local}") String syncLocal) {
+        this.clerkClient = clerkClient;
+        this.personRepo = personRepo;
+        this.syncLocal = syncLocal.equals("true");
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     private void syncUsersWithClerk() {
@@ -48,24 +57,44 @@ public class ClerkUserSync {
     }
 
     private void processUsers(List<User> users) {
-        List<Person> persons = new ArrayList<>(users.size());
-
+        UserService userService = clerkClient.getUserService();
         for (User user : users) {
             if (!StringUtil.isNullOrEmpty(user.getExternalId())) {
                 //we don't update our persons with external data
                 //we could probably skip users after we find one with external id because we order by created_at
+                if (syncLocal) {
+                    try {
+                        Optional<Person> person = personRepo.findById(UUID.fromString(user.getExternalId()));
+                        if (person.isEmpty()) {
+                            Person newPerson = createPersonFromUser(user);
+                            personRepo.save(newPerson);
+                        }
+                    } catch (Exception e) {
+                        //this should only happen in dev and test environment, if at all
+                        log.error("Failed to find person with id: " + user.getExternalId());
+                    }
+                }
                 continue;
             }
 
-            Person person = new Person();
-            person.setClerkId(user.getId());
-            person.setEmail(findPrimaryEmail(user));
-            person.setName(user.getFirstName());
-            person.setLastname(user.getLastName());
-            persons.add(person);
-        }
+            Person person = createPersonFromUser(user);
+            Person saved = personRepo.save(person);
 
-        personRepo.saveAll(persons);
+            //we shouldn't make this work around library, but error is throw in library if we use it as intended
+            //we should call userService.update
+            WithUserPatchRequestBody body = new WithUserPatchRequestBody();
+            body.setExternalId(saved.getId().toString());
+            userService.getHttpClient().users().byUser_id(user.getId()).patch(body);
+        }
+    }
+
+    private Person createPersonFromUser(User user) {
+        Person person = new Person();
+        person.setClerkId(user.getId());
+        person.setEmail(findPrimaryEmail(user));
+        person.setName(user.getFirstName());
+        person.setLastname(user.getLastName());
+        return person;
     }
 
     private String findPrimaryEmail(User user) {

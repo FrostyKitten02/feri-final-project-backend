@@ -34,6 +34,4 @@ public class ProjectManagerApplication {
         final ClerkClient client = new ClerkClient(adapter);
         return client;
     }
-
-
 }
