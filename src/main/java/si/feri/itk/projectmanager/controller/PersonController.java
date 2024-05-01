@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.model.PersonDto;
-import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.GetPersonResponse;
 import si.feri.itk.projectmanager.service.PersonService;
 
-import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin
@@ -27,15 +25,6 @@ public class PersonController {
 
         GetPersonResponse response = new GetPersonResponse();
         response.setPerson(person);
-        return response;
-    }
-
-    @GetMapping("/people-on-project/{projectId}")
-    public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
-        List<PersonDto> people = personService.findPeopleOnProject(projectId);
-        GetPeopleResponse response = new GetPeopleResponse();
-        response.setPeople(people);
-        response.setProjectId(projectId);
         return response;
     }
 }
