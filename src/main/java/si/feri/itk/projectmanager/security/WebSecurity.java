@@ -8,15 +8,20 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import si.feri.itk.projectmanager.security.clerk.ClerkFilter;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurity {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, ClerkFilter clerkFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ClerkFilter clerkFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests
@@ -28,6 +33,18 @@ public class WebSecurity {
                     httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 });
         return http.build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.applyPermitDefaultValues();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",configuration);
+        return source;
     }
 
 }
