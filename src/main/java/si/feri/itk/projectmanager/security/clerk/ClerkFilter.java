@@ -21,6 +21,7 @@ import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.exceptions.implementation.UnauthorizedException;
 import si.feri.itk.projectmanager.security.SecurityConstants;
+import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -32,30 +33,43 @@ import java.util.Map;
 @Slf4j
 public class ClerkFilter extends OncePerRequestFilter {
     private final String clerkPublicKey;
-    private final RequestMatcher[] requestMatchers = new RequestMatcher[2];
+    private final RequestMatcher[] requestMatchers = new RequestMatcher[3];
 
     public ClerkFilter(
                 @Value("${clerk.public-jwt-key}") String clerkPublicKey,
                 @Value("${springdoc.api-docs.path}") String swaggerDocs,
-                @Value("${swagger.ui-url}") String swaggerUi
+                @Value("${swagger.ui-url}") String swaggerUi,
+                @Value("${springdoc.api-docs.yaml-path}") String swaggerYaml
     ) {
         this.clerkPublicKey = clerkPublicKey;
         requestMatchers[0] = new AntPathRequestMatcher(swaggerDocs + "/**", HttpMethod.GET.name());
         requestMatchers[1] = new AntPathRequestMatcher(swaggerUi + "/**", HttpMethod.GET.name());
+        requestMatchers[2] = new AntPathRequestMatcher(swaggerYaml + "/**", HttpMethod.GET.name());
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
-        Cookie sessionCookie = null;
-        for (Cookie c : cookies) {
-            if (c.getName().equals(ClerkConstants.CLEAR_SESSION_COOKIE_NAME)) {
-                sessionCookie = c;
-                break;
+        String session = null;
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals(ClerkConstants.CLEAR_SESSION_COOKIE_NAME)) {
+                    session = c.getValue();
+                    break;
+                }
             }
         }
 
-        if (sessionCookie == null) {
+        if (StringUtil.isNullOrEmpty(session)) {
+            String authHeader = request.getHeader("Authorization");
+            if (StringUtil.isNullOrEmpty(authHeader)) {
+                throw new BadRequestException("Authorization header not found");
+            }
+            session = authHeader.replace("Bearer ", "");
+        }
+
+
+        if (StringUtil.isNullOrEmpty(session)) {
             throw new BadRequestException("Session cookie not found");
         }
 
@@ -67,7 +81,7 @@ public class ClerkFilter extends OncePerRequestFilter {
             Jws<Claims> jwt = Jwts.parser()
                     .verifyWith(publicKey)
                     .build()
-                    .parseSignedClaims(sessionCookie.getValue());
+                    .parseSignedClaims(session);
             Map<String, Object> payload = jwt.getPayload();
             String sessionId = payload.get(ClerkConstants.CLERK_PAYLOAD_SESSION_ID).toString();
             String userId = payload.get(ClerkConstants.CLERK_PAYLOAD_USER_ID).toString();
