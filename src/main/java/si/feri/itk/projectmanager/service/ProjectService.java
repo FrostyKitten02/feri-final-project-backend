@@ -4,18 +4,28 @@ package si.feri.itk.projectmanager.service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
+import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
+import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
 import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.ProjectList;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
+import si.feri.itk.projectmanager.paging.PageInfo;
+import si.feri.itk.projectmanager.paging.ProjectSortInfo;
+import si.feri.itk.projectmanager.paging.SortInfo;
+import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
+import si.feri.itk.projectmanager.repository.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
@@ -29,6 +39,7 @@ import java.util.UUID;
 public class ProjectService {
     private final PersonRepo personRepo;
     private final ProjectRepo projectRepo;
+    private final ProjectListRepo projectListRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
     public UUID createProject(CreateProjectRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserId(servletRequest);
@@ -105,6 +116,27 @@ public class ProjectService {
         personOnProject.setPersonId(person.getId());
         personOnProject.setProjectId(project.getId());
         personOnProjectRepo.save(personOnProject);
+    }
+
+    public ListProjectResponse searchUsersProjects(PageInfoRequest pageInfoRequest, ProjectSortInfoRequest sortInfoRequest, ProjectListSearchParams searchParams, HttpServletRequest servletRequest) {
+        //todo use search params!!!
+        SortInfo<?> sort;
+        if (sortInfoRequest != null) {
+            sort = sortInfoRequest.toSortInfo();
+        } else {
+            sort = new ProjectSortInfo();
+        }
+
+        String userId = RequestUtil.getUserId(servletRequest);
+        if (StringUtil.isNullOrEmpty(userId)) {
+            log.warn("Unauthorized user tried to get a project");
+            //this should never happen, we have a big problem if it does!
+            throw new BadRequestException("User is not logged in");
+        }
+
+
+        Page<ProjectList> projectsPage = projectListRepo.findAllByOwnerId(userId, PageInfo.toPageRequest(pageInfoRequest, sort));
+        return ListProjectResponse.fromPage(projectsPage);
     }
 
 }
