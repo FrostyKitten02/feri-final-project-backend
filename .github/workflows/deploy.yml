@@ -42,12 +42,12 @@ jobs:
 
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          password: ${{ secrets.USER_PASSWORD }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          env:
-            password: ${{ secrets.USER_PASSWORD }}
           script: |
             cd ~/root/projectmanager
             rm app.jar
