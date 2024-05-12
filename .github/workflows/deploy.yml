@@ -43,16 +43,15 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
-          password: ${{ secrets.USER_PASSWORD }}
+          PASSWORD: ${{ secrets.USER_PASSWORD }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          envs: password
+          envs: PASSWORD
           script: |
             cd ~/root/projectmanager
             rm app.jar
             mv target/*.jar app.jar
             rm -rf app/target
-            echo $password
-            echo $password | sudo -S systemctl restart projectmanager
+            echo $PASSWORD | sudo -S systemctl restart projectmanager
