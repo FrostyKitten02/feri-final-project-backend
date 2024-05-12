@@ -31,13 +31,25 @@ jobs:
       - name: Build with Maven
         run: mvn -B package -Dspring.config.location=src/main/resources/ci-application.properties --file pom.xml
 
-      - name: deploy
+      - name: Upload files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           source: target/*.jar
-          target: ~/root/projectmanager/app
-          strip_components: true
-          rm: true
+          target: ~/root/projectmanager
+
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          env:
+            password: ${{ secrets.USER_PASSWORD }}
+          script: |
+            cd ~/root/projectmanager
+            rm app.jar
+            mv target/*.jar app.jar
+            rm -rf app/target
