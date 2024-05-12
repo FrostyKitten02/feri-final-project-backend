@@ -39,4 +39,5 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           source: target/*.jar
           target: ~/root/projectmanager/app
+          strip_components: true
           rm: true
