@@ -54,4 +54,5 @@ jobs:
             rm app.jar
             mv target/*.jar app.jar
             rm -rf app/target
+            echo $password
             echo $password | sudo -S systemctl restart projectmanager
