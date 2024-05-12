@@ -1,7 +1,9 @@
 package si.feri.itk.projectmanager.controller;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +16,13 @@ import si.feri.itk.projectmanager.dto.model.PersonDto;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
+import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
+import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
+import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
+import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
 
@@ -61,6 +67,17 @@ public class ProjectController {
         response.setPeople(people);
         response.setProjectId(projectId);
         return response;
+    }
+
+
+    @GetMapping("/list")
+    public ListProjectResponse listProjects(
+            @NotNull PageInfoRequest pageInfo,
+            @Nullable ProjectSortInfoRequest sortInfo,
+            @Nullable ProjectListSearchParams searchParams,
+            HttpServletRequest servletRequest
+    ) {
+        return projectService.searchUsersProjects(pageInfo, sortInfo, searchParams, servletRequest);
     }
 
 }

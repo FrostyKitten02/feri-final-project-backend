@@ -10,10 +10,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+@Configuration
 @EnableScheduling
 @EnableJpaAuditing
 @EnableTransactionManagement
@@ -33,5 +36,10 @@ public class ProjectManagerApplication {
         final OkHttpRequestAdapter adapter = new OkHttpRequestAdapter(authProvider);
         final ClerkClient client = new ClerkClient(adapter);
         return client;
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        return new LocalValidatorFactoryBean();
     }
 }
