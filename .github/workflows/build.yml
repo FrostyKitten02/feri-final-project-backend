@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java maven CI
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres
