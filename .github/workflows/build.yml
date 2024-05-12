@@ -2,7 +2,7 @@ name: Java maven CI
 
 on:
   push:
-    branches: [ "cicd-testing" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
