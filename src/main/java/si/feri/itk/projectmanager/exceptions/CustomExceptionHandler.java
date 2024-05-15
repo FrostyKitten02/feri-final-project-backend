@@ -13,13 +13,15 @@ public class CustomExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ExceptionResponse> handleUnhandledRuntimeException(RuntimeException ex) {
         HttpStatus status = HttpStatus.BAD_GATEWAY;
-        log.warn("Unhandled server exception: {}", ex.getMessage());
+        log.warn("Unhandled server exception: {}", ex.getLocalizedMessage());
         log.error(ex.getLocalizedMessage(), ex);
         return ResponseEntity.status(status).body(new ExceptionResponse(status, "Unhandled server exception"));
     }
 
     @ExceptionHandler(CustomRuntimeException.class)
     public ResponseEntity<ExceptionResponse> handleItemNotFound(CustomRuntimeException ex) {
+        log.warn("Custom exception: {}", ex.getLocalizedMessage());
+        log.warn(ex.getLocalizedMessage(), ex);
         return ex.buildResponseEntity();
     }
 
