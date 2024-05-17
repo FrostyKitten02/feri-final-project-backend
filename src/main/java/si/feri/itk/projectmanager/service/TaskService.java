@@ -15,6 +15,7 @@ import si.feri.itk.projectmanager.repository.TaskRepo;
 import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
+import si.feri.itk.projectmanager.util.service.TaskServiceUtil;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -26,54 +27,29 @@ public class TaskService {
     private final TaskRepo taskRepo;
     private final WorkPackageRepo workPackageRepo;
     private final ProjectRepo projectRepo;
+
     public UUID createTask(CreateTaskRequest request, HttpServletRequest servletRequest) {
-        String userId = RequestUtil.getUserId(servletRequest);
-        if (StringUtil.isNullOrEmpty(userId)) {
-            log.warn("Unauthorized user tried to create a project");
-            //this should never happen, we have a big problem if it does!
-            throw new BadRequestException("User is not logged in");
-        }
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
 
-        if (request.getWorkPackageId() == null) {
-            throw new BadRequestException("Work package id is required");
-        }
+        TaskServiceUtil.validateCreateTaskRequest(request);
+        WorkPackage workPackage = getWorkPackageAndValidateOwner(request.getWorkPackageId(), userId);
 
-        Optional<WorkPackage> workPackage = workPackageRepo.findById(request.getWorkPackageId());
+        Task task = TaskServiceUtil.createNewTask(request);
+        TaskServiceUtil.validateTaskDates(task, workPackage);
+        return taskRepo.save(task).getId();
+    }
+
+    private WorkPackage getWorkPackageAndValidateOwner(UUID workPackageId, String ownerId) {
+        Optional<WorkPackage> workPackage = workPackageRepo.findById(workPackageId);
         if (workPackage.isEmpty()) {
             throw new ItemNotFoundException("Work package not found");
         }
 
         Optional<Project> project = projectRepo.findById(workPackage.get().getProjectId());
-        if (project.isEmpty() || !project.get().getOwnerId().equals(userId)) {
+        if (project.isEmpty() || !project.get().getOwnerId().equals(ownerId)) {
             throw new ItemNotFoundException("Work package not found");
         }
 
-        if (StringUtil.isNullOrEmpty(request.getTitle())) {
-            throw new BadRequestException("Title is required");
-        }
-
-        if (request.getIsRelevant() == null) {
-            throw new BadRequestException("IsRelevant is required");
-        }
-
-        if (request.getStartDate() == null) {
-            throw new BadRequestException("Start date is required");
-        }
-
-        if (request.getEndDate() == null) {
-            throw new BadRequestException("End date is required");
-        }
-
-        if (request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BadRequestException("Start date must be before end date");
-        }
-
-        Task task = new Task();
-        task.setTitle(request.getTitle());
-        task.setStartDate(request.getStartDate());
-        task.setEndDate(request.getEndDate());
-        task.setWorkPackageId(request.getWorkPackageId());
-        task.setIsRelevant(request.getIsRelevant());
-        return taskRepo.save(task).getId();
+        return workPackage.get();
     }
 }
