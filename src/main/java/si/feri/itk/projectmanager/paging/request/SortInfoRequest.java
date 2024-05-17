@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.paging.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import si.feri.itk.projectmanager.paging.SortInfo;
