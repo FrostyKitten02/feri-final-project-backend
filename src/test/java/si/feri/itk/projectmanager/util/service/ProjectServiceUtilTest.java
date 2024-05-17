@@ -74,7 +74,7 @@ public class ProjectServiceUtilTest {
 
         request.setPersonId(UUID.randomUUID());
         Assertions.assertDoesNotThrow(() -> {
-            ProjectServiceUtil.validateAddPersonToProjectRequest(java.util.UUID.randomUUID(), new si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest());
+            ProjectServiceUtil.validateAddPersonToProjectRequest(java.util.UUID.randomUUID(), request);
         });
     }
 
