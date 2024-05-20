@@ -21,6 +21,10 @@ public class WorkPackageServiceUtil {
             throw new BadRequestException("Title is required");
         }
 
+        if (request.getIsRelevant() == null) {
+            throw new BadRequestException("IsRelevant is required");
+        }
+
         if (request.getStartDate() == null) {
             throw new BadRequestException("Start date is required");
         }
@@ -31,10 +35,6 @@ public class WorkPackageServiceUtil {
 
         if (!request.getStartDate().isAfter(request.getEndDate())) {
             throw new BadRequestException("Start date must be before end date");
-        }
-
-        if (request.getIsRelevant() == null) {
-            throw new BadRequestException("IsRelevant is required");
         }
     }
 
