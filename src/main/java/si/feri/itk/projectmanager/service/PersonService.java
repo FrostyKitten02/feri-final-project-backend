@@ -18,16 +18,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PersonService {
     private final PersonRepo personRepo;
-    private final PersonOnProjectRepo personOnProjectRepo;
     public PersonDto getPersonById(UUID personId) {
         return personRepo.findById(personId).map(PersonMapper.INSTANCE::toDto).orElseThrow(() -> new ItemNotFoundException("Person not found"));
     }
 
     public List<PersonDto> findPeopleOnProject(UUID projectId) {
-        List<UUID> peopleIds = personOnProjectRepo.findAllByProjectId(projectId)
-                .stream().map(PersonOnProject::getPersonId)
-                .toList();
-        List<Person> people = personRepo.findAllById(peopleIds);
+        List<Person> people = personRepo.findAllByProjectId(projectId);
         return people.stream().map(PersonMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
