@@ -37,7 +37,7 @@ public class TaskServiceUtil {
         }
     }
 
-    public static void validateTaskDates(Task task, WorkPackage workPackage) {
+    public static void validateTaskBounds(Task task, WorkPackage workPackage) {
         LocalDate taskStartDate = task.getStartDate();
         LocalDate taskEndDate = task.getEndDate();
         if (taskStartDate.isAfter(workPackage.getEndDate()) || taskStartDate.isBefore(workPackage.getStartDate())) {
