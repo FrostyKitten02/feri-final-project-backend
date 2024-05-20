@@ -16,10 +16,10 @@ public class CreatePersonTypeRequest {
     @DecimalMax(value = "1.00")
     @DecimalMin(value = "0.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal researchAvailability;
+    private BigDecimal research;
 
     @DecimalMax(value = "1.00")
     @DecimalMin(value = "0.00")
     @Digits(integer = 1, fraction = 2)
-    private BigDecimal educateAvailability;
+    private BigDecimal educate;
 }
