@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
-import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.Task;
@@ -14,7 +13,6 @@ import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.TaskRepo;
 import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
-import si.feri.itk.projectmanager.util.StringUtil;
 import si.feri.itk.projectmanager.util.service.TaskServiceUtil;
 
 import java.util.Optional;
@@ -35,7 +33,7 @@ public class TaskService {
         WorkPackage workPackage = getWorkPackageAndValidateOwner(request.getWorkPackageId(), userId);
 
         Task task = TaskServiceUtil.createNewTask(request);
-        TaskServiceUtil.validateTaskDates(task, workPackage);
+        TaskServiceUtil.validateTaskBounds(task, workPackage);
         return taskRepo.save(task).getId();
     }
 
