@@ -32,7 +32,7 @@ public class TaskServiceUtil {
             throw new BadRequestException("End date is required");
         }
 
-        if (request.getStartDate().isAfter(request.getEndDate())) {
+        if (!request.getStartDate().isAfter(request.getEndDate())) {
             throw new BadRequestException("Start date must be before end date");
         }
     }
