@@ -57,7 +57,7 @@ public class ProjectController {
     @PostMapping("{projectId}/add-person-to-project/")
     public void addPersonToProject(@PathVariable UUID projectId, @RequestBody AddPersonToProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
         projectService.addPersonToProject(projectId, request, servletRequest);
-        servletResponse.setStatus(HttpServletResponse.SC_CREATED);
+        servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @GetMapping("/{projectId}/people")
