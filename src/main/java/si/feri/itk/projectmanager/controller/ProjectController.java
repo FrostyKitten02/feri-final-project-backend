@@ -62,7 +62,7 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/people")
     public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
-        List<PersonDto> people = personService.findPeopleOnProject(projectId);
+        List<PersonDto> people = personService.findPeopleOnProject(projectId, servletRequest);
         GetPeopleResponse response = new GetPeopleResponse();
         response.setPeople(people);
         response.setProjectId(projectId);
