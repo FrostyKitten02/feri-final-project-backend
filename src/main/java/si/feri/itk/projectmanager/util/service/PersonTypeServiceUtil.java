@@ -38,7 +38,7 @@ public class PersonTypeServiceUtil {
         }
 
         if (request.getEndDate() != null && request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BadRequestException("End date is required");
+            throw new BadRequestException("End date must be after start date");
         }
     }
 
