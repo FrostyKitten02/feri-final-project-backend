@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,4 +24,7 @@ public class CreatePersonTypeRequest {
     @DecimalMin(value = "0.00")
     @Digits(integer = 1, fraction = 2)
     private BigDecimal educate;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private UUID personId;
 }

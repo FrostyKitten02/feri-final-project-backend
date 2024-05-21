@@ -28,6 +28,18 @@ public class PersonTypeServiceUtil {
         if (total.compareTo(BigDecimal.ONE) >= 1) {
             throw new BadRequestException("Sum of educateAvailability and researchAvailability must be less than or equal to 1");
         }
+
+        if (request.getPersonId() == null) {
+            throw new BadRequestException("Person id is required");
+        }
+
+        if (request.getStartDate() == null) {
+            throw new BadRequestException("Start date is required");
+        }
+
+        if (request.getEndDate() != null && request.getStartDate().isAfter(request.getEndDate())) {
+            throw new BadRequestException("End date is required");
+        }
     }
 
     public static BigDecimal calculateMaxAvailability(CreatePersonTypeRequest request) {
@@ -36,9 +48,8 @@ public class PersonTypeServiceUtil {
 
     public static BigDecimal calculateMaxAvailability(BigDecimal educate, BigDecimal research) {
         //max bonus of 0.2 when educate is 1 and research is 0
-        BigDecimal avalibilityDelta = educate.subtract(research);
-        BigDecimal bonusMultiplier = BigDecimal.valueOf(1, 1);
-        BigDecimal bonusAvailability = avalibilityDelta.add(BigDecimal.ONE).multiply(bonusMultiplier);
+        BigDecimal bonusMultiplier = BigDecimal.valueOf(2, 1);//20%
+        BigDecimal bonusAvailability = educate.multiply(bonusMultiplier);//20% of educate
         return research.add(bonusAvailability).setScale(2, RoundingMode.DOWN);
     }
 
@@ -47,6 +58,9 @@ public class PersonTypeServiceUtil {
         personType.setName(request.getName());
         personType.setResearch(request.getResearch());
         personType.setEducate(request.getEducate());
+        personType.setStartDate(request.getStartDate());
+        personType.setEndDate(request.getEndDate());
+        personType.setPersonId(request.getPersonId());
         personType.setMaxAvailability(calculateMaxAvailability(request));
         return personType;
     }

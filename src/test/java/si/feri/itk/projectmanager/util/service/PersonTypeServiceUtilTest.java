@@ -10,6 +10,8 @@ import si.feri.itk.projectmanager.exceptions.CustomRuntimeException;
 import si.feri.itk.projectmanager.model.person.PersonType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonTypeServiceUtilTest {
@@ -38,6 +40,26 @@ public class PersonTypeServiceUtilTest {
 
 
         request.setResearch(BigDecimal.valueOf(5, 1));
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            PersonTypeServiceUtil.validateCreatePersonTypeRequest(request);
+        });
+
+        request.setPersonId(UUID.randomUUID());
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            PersonTypeServiceUtil.validateCreatePersonTypeRequest(request);
+        });
+
+        request.setStartDate(LocalDate.now());
+        Assertions.assertDoesNotThrow(() -> {
+            PersonTypeServiceUtil.validateCreatePersonTypeRequest(request);
+        });
+
+        request.setEndDate(LocalDate.now().minusDays(1));
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            PersonTypeServiceUtil.validateCreatePersonTypeRequest(request);
+        });
+
+        request.setEndDate(LocalDate.now());
         Assertions.assertDoesNotThrow(() -> {
             PersonTypeServiceUtil.validateCreatePersonTypeRequest(request);
         });
@@ -66,11 +88,17 @@ public class PersonTypeServiceUtilTest {
         request.setName("Test name");
         request.setEducate(BigDecimal.valueOf(50, 2));
         request.setResearch(BigDecimal.valueOf(50, 2));
+        request.setPersonId(UUID.randomUUID());
+        request.setStartDate(LocalDate.now());
+        request.setEndDate(LocalDate.now().plusDays(1));
         PersonType personType = PersonTypeServiceUtil.createPersonType(request);
         Assertions.assertEquals(request.getName(), personType.getName());
         Assertions.assertEquals(request.getEducate(), personType.getEducate());
         Assertions.assertEquals(request.getResearch(), personType.getResearch());
         Assertions.assertNotNull(personType.getMaxAvailability());
+        Assertions.assertEquals(request.getPersonId(), personType.getPersonId());
+        Assertions.assertEquals(request.getStartDate(), personType.getStartDate());
+        Assertions.assertEquals(request.getEndDate(), personType.getEndDate());
     }
 
 }
