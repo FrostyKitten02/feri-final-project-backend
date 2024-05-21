@@ -13,4 +13,18 @@ import java.util.UUID;
 public interface ProjectRepo extends JpaRepository<Project, UUID> {
     @Query("SELECT p FROM Project p WHERE p.id = :projectId AND p.ownerId = :ownerId")
     Optional<Project> findByIdAndOwnerId(@Param("projectId") UUID projectId, @Param("ownerId") String ownerId);
+
+
+    @Query("select p from Project as p " +
+            "where p.id = (" +
+            "   select wp.projectId " +
+            "   from WorkPackage as wp " +
+            "   where wp.id = (" +
+            "       select tsk.workPackageId " +
+            "       from Task as tsk " +
+            "       where tsk.id = :taskId " +
+            "   ) " +
+            " )" +
+            "AND p.ownerId = :ownerId")
+    Optional<Project> findProjectByTaskIdAndOwnerId(UUID taskId, String ownerId);
 }
