@@ -31,5 +31,8 @@ public class PersonService {
         return people.stream().map(PersonMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
+    public List<PersonDto> getAllPeople() {
+        return personRepo.findAll().stream().map(PersonMapper.INSTANCE::toDto).collect(Collectors.toList());
+    }
 
 }

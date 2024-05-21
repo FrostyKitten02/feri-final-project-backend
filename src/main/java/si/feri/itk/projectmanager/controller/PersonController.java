@@ -11,6 +11,7 @@ import si.feri.itk.projectmanager.dto.model.PersonDto;
 import si.feri.itk.projectmanager.dto.response.GetPersonResponse;
 import si.feri.itk.projectmanager.service.PersonService;
 
+import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin
@@ -26,5 +27,11 @@ public class PersonController {
         GetPersonResponse response = new GetPersonResponse();
         response.setPerson(person);
         return response;
+    }
+
+    //FIXME: This is temporary endpoint, we will implement pagination later
+    @GetMapping("/all")
+    public List<PersonDto> getAllPeople() {
+        return personService.getAllPeople();
     }
 }
