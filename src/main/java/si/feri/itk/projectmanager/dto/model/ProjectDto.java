@@ -23,6 +23,7 @@ public class ProjectDto implements IProjectBudget {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<WorkPackageDto> workPackages;
+    private UUID projectBudgetSchemaId;
 
     //budget
     @Digits(integer = 8, fraction = 2)
