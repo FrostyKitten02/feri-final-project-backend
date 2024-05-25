@@ -8,6 +8,7 @@ import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
 import si.feri.itk.projectmanager.util.StringUtil;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProjectServiceUtil {
@@ -29,14 +30,39 @@ public class ProjectServiceUtil {
         if (request.getStartDate().isAfter(request.getEndDate())) {
             throw new BadRequestException("Start date must be before end date");
         }
+
+        if (request.getProjectBudgetSchemaId() == null) {
+            throw new BadRequestException("Project budget schema is required");
+        }
+
+        if (request.getStaffBudget() == null) {
+            throw new BadRequestException("Staff budget is required");
+        }
+
+        if (request.getTravelBudget() == null) {
+            throw new BadRequestException("Travel budget is required");
+        }
+
+        if (request.getEquipmentBudget() == null) {
+            throw new BadRequestException("Equipment budget is required");
+        }
+
+        if (request.getSubcontractBudget() == null) {
+            throw new BadRequestException("Subcontract budget is required");
+        }
     }
 
-    public static Project createNewProject(CreateProjectRequest request, String userId) {
+    public static Project createNewProject(CreateProjectRequest request, String userId, BigDecimal indirectBudget) {
         Project project = new Project();
         project.setTitle(request.getTitle());
         project.setStartDate(request.getStartDate());
         project.setEndDate(request.getEndDate());
         project.setOwnerId(userId);
+        project.setStaffBudget(request.getStaffBudget());
+        project.setTravelBudget(request.getTravelBudget());
+        project.setEquipmentBudget(request.getEquipmentBudget());
+        project.setSubcontractBudget(request.getSubcontractBudget());
+        project.setIndirectBudget(indirectBudget);
         return project;
     }
 

@@ -11,6 +11,7 @@ import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -20,28 +21,66 @@ public class ProjectServiceUtilTest {
     @Test
     public void testValidateCreateProjectRequest() {
         CreateProjectRequest request = new CreateProjectRequest();
+        request.setTitle("Test title");
+        request.setStartDate(LocalDate.now());
+        request.setEndDate(LocalDate.now().plusDays(1));
+        request.setProjectBudgetSchemaId(UUID.randomUUID());
+        request.setStaffBudget(BigDecimal.valueOf(100));
+        request.setTravelBudget(BigDecimal.valueOf(101));
+        request.setEquipmentBudget(BigDecimal.valueOf(102));
+        request.setSubcontractBudget(BigDecimal.valueOf(103));
+
+        Assertions.assertDoesNotThrow(() -> {
+            ProjectServiceUtil.validateCreateProjectRequest(request);
+        });
+
+        request.setTitle(null);
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
 
-        request.setTitle("Test title");
+
+        request.setTitle("Title");
+        request.setStartDate(null);
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
 
         request.setStartDate(LocalDate.now());
+        request.setEndDate(null);
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
+
 
         request.setEndDate(LocalDate.now().minusDays(1));
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
 
-
         request.setEndDate(LocalDate.now().plusDays(1));
-        Assertions.assertDoesNotThrow(() -> {
+        request.setEquipmentBudget(null);
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            ProjectServiceUtil.validateCreateProjectRequest(request);
+        });
+
+
+        request.setEquipmentBudget(BigDecimal.TEN);
+        request.setTravelBudget(null);
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            ProjectServiceUtil.validateCreateProjectRequest(request);
+        });
+
+        request.setTravelBudget(BigDecimal.TEN);
+        request.setStaffBudget(null);
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
+            ProjectServiceUtil.validateCreateProjectRequest(request);
+        });
+
+
+        request.setStaffBudget(BigDecimal.TEN);
+        request.setSubcontractBudget(null);
+        Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
     }
@@ -52,12 +91,22 @@ public class ProjectServiceUtilTest {
         request.setTitle("Test title");
         request.setStartDate(LocalDate.now());
         request.setEndDate(LocalDate.now().plusDays(1));
+        request.setStaffBudget(BigDecimal.valueOf(100));
+        request.setTravelBudget(BigDecimal.valueOf(101));
+        request.setEquipmentBudget(BigDecimal.valueOf(102));
+        request.setSubcontractBudget(BigDecimal.valueOf(103));
         String userId = "testUserId";
-        Project project = ProjectServiceUtil.createNewProject(request, userId);
+        BigDecimal indirectBudget = BigDecimal.valueOf(1000);
+        Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
         Assertions.assertEquals(request.getTitle(), project.getTitle());
         Assertions.assertEquals(request.getStartDate(), project.getStartDate());
         Assertions.assertEquals(request.getEndDate(), project.getEndDate());
         Assertions.assertEquals(userId, project.getOwnerId());
+        Assertions.assertEquals(request.getStaffBudget(), project.getStaffBudget());
+        Assertions.assertEquals(request.getTravelBudget(), project.getTravelBudget());
+        Assertions.assertEquals(request.getEquipmentBudget(), project.getEquipmentBudget());
+        Assertions.assertEquals(request.getSubcontractBudget(), project.getSubcontractBudget());
+        Assertions.assertEquals(indirectBudget, project.getIndirectBudget());
     }
 
     @Test

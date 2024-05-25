@@ -16,6 +16,7 @@ import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
 import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.model.ProjectList;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
@@ -24,11 +25,14 @@ import si.feri.itk.projectmanager.paging.SortInfo;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
+import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
 import si.feri.itk.projectmanager.repository.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
+import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,10 +44,15 @@ public class ProjectService {
     private final ProjectRepo projectRepo;
     private final ProjectListRepo projectListRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
+    private final ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
     public UUID createProject(CreateProjectRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         ProjectServiceUtil.validateCreateProjectRequest(request);
-        Project project = ProjectServiceUtil.createNewProject(request, userId);
+
+        ProjectBudgetSchema schema = projectBudgetSchemaRepo.findById(request.getProjectBudgetSchemaId()).orElseThrow(()-> new ItemNotFoundException("Project budget schema not found"));
+        BigDecimal indirectBudget = ProjectBudgetUtil.calculateIndirectBudget(request, schema);
+
+        Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
         return projectRepo.save(project).getId();
     }
 

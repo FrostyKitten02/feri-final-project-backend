@@ -13,12 +13,16 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import si.feri.itk.projectmanager.TestUtil;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
+import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
 import si.feri.itk.projectmanager.repository.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +35,8 @@ public class ProjectServiceTest {
     private ProjectListRepo projectListRepo;
     @Mock
     private PersonOnProjectRepo personOnProjectRepo;
+    @Mock
+    private ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
     @InjectMocks
     private ProjectService projectService;
 
@@ -53,10 +59,21 @@ public class ProjectServiceTest {
             return mockSaveProject;
         });
 
+
+        UUID schemaId = UUID.randomUUID();
+        ProjectBudgetSchema schema = new ProjectBudgetSchema();
+        schema.setIndirectBudget(BigDecimal.valueOf(2,1));
+        Mockito.when(projectBudgetSchemaRepo.findById(schemaId)).thenReturn(Optional.of(schema));
+
         CreateProjectRequest request = new CreateProjectRequest();
         request.setTitle("Test title");
         request.setStartDate(LocalDate.now());
         request.setEndDate(LocalDate.now().plusDays(1));
+        request.setStaffBudget(BigDecimal.ONE);
+        request.setTravelBudget(BigDecimal.ONE);
+        request.setEquipmentBudget(BigDecimal.ONE);
+        request.setSubcontractBudget(BigDecimal.ONE);
+        request.setProjectBudgetSchemaId(schemaId);
         UUID uuid = projectService.createProject(request, servletRequest);
 
         Assertions.assertNotNull(uuid);
