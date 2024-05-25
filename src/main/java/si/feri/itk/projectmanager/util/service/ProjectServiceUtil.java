@@ -47,7 +47,7 @@ public class ProjectServiceUtil {
             throw new BadRequestException("Equipment budget is required");
         }
 
-        if (request.getSubcontractBudget() == null) {
+        if (request.getSubcontractingBudget() == null) {
             throw new BadRequestException("Subcontract budget is required");
         }
     }
@@ -61,8 +61,9 @@ public class ProjectServiceUtil {
         project.setStaffBudget(request.getStaffBudget());
         project.setTravelBudget(request.getTravelBudget());
         project.setEquipmentBudget(request.getEquipmentBudget());
-        project.setSubcontractBudget(request.getSubcontractBudget());
+        project.setSubcontractingBudget(request.getSubcontractingBudget());
         project.setIndirectBudget(indirectBudget);
+        project.setProjectBudgetSchemaId(request.getProjectBudgetSchemaId());
         return project;
     }
 

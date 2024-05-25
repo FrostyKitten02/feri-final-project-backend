@@ -6,10 +6,10 @@ public interface IProjectBudgetRequest {
     BigDecimal getStaffBudget();
     BigDecimal getTravelBudget();
     BigDecimal getEquipmentBudget();
-    BigDecimal getSubcontractBudget();
+    BigDecimal getSubcontractingBudget();
 
     void setStaffBudget(BigDecimal staffBudget);
     void setTravelBudget(BigDecimal travelBudget);
     void setEquipmentBudget(BigDecimal equipmentBudget);
-    void setSubcontractBudget(BigDecimal subcontractBudget);
+    void setSubcontractingBudget(BigDecimal subcontractBudget);
 }

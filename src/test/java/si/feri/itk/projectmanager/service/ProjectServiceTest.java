@@ -72,7 +72,7 @@ public class ProjectServiceTest {
         request.setStaffBudget(BigDecimal.ONE);
         request.setTravelBudget(BigDecimal.ONE);
         request.setEquipmentBudget(BigDecimal.ONE);
-        request.setSubcontractBudget(BigDecimal.ONE);
+        request.setSubcontractingBudget(BigDecimal.ONE);
         request.setProjectBudgetSchemaId(schemaId);
         UUID uuid = projectService.createProject(request, servletRequest);
 

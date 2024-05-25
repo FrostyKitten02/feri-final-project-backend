@@ -32,7 +32,7 @@ public class Project extends BaseModel implements IProjectBudget {
     @Column(precision = 10, scale = 2)
     private BigDecimal equipmentBudget;
     @Column(precision = 10, scale = 2)
-    private BigDecimal subcontractBudget;
+    private BigDecimal subcontractingBudget;
     @Column(precision = 10, scale = 2)
     private BigDecimal indirectBudget;
 }
