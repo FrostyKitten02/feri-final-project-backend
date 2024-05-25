@@ -33,5 +33,5 @@ public class CreateProjectRequest implements IProjectBudgetRequest {
     private BigDecimal equipmentBudget;
     @DecimalMax(value = "99999999.99")
     @DecimalMin(value = "0.00")
-    private BigDecimal subcontractBudget;
+    private BigDecimal subcontractingBudget;
 }

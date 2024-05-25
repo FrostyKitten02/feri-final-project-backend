@@ -28,7 +28,7 @@ public class ProjectServiceUtilTest {
         request.setStaffBudget(BigDecimal.valueOf(100));
         request.setTravelBudget(BigDecimal.valueOf(101));
         request.setEquipmentBudget(BigDecimal.valueOf(102));
-        request.setSubcontractBudget(BigDecimal.valueOf(103));
+        request.setSubcontractingBudget(BigDecimal.valueOf(103));
 
         Assertions.assertDoesNotThrow(() -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
@@ -79,7 +79,7 @@ public class ProjectServiceUtilTest {
 
 
         request.setStaffBudget(BigDecimal.TEN);
-        request.setSubcontractBudget(null);
+        request.setSubcontractingBudget(null);
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             ProjectServiceUtil.validateCreateProjectRequest(request);
         });
@@ -94,7 +94,8 @@ public class ProjectServiceUtilTest {
         request.setStaffBudget(BigDecimal.valueOf(100));
         request.setTravelBudget(BigDecimal.valueOf(101));
         request.setEquipmentBudget(BigDecimal.valueOf(102));
-        request.setSubcontractBudget(BigDecimal.valueOf(103));
+        request.setSubcontractingBudget(BigDecimal.valueOf(103));
+        request.setProjectBudgetSchemaId(UUID.randomUUID());
         String userId = "testUserId";
         BigDecimal indirectBudget = BigDecimal.valueOf(1000);
         Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
@@ -105,8 +106,9 @@ public class ProjectServiceUtilTest {
         Assertions.assertEquals(request.getStaffBudget(), project.getStaffBudget());
         Assertions.assertEquals(request.getTravelBudget(), project.getTravelBudget());
         Assertions.assertEquals(request.getEquipmentBudget(), project.getEquipmentBudget());
-        Assertions.assertEquals(request.getSubcontractBudget(), project.getSubcontractBudget());
+        Assertions.assertEquals(request.getSubcontractingBudget(), project.getSubcontractingBudget());
         Assertions.assertEquals(indirectBudget, project.getIndirectBudget());
+        Assertions.assertEquals(request.getProjectBudgetSchemaId(), project.getProjectBudgetSchemaId());
     }
 
     @Test

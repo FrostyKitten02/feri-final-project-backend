@@ -32,7 +32,7 @@ public class ProjectDto implements IProjectBudget {
     @Digits(integer = 8, fraction = 2)
     private BigDecimal equipmentBudget;
     @Digits(integer = 8, fraction = 2)
-    private BigDecimal subcontractBudget;
+    private BigDecimal subcontractingBudget;
     @Digits(integer = 8, fraction = 2)
     private BigDecimal indirectBudget;
 }
