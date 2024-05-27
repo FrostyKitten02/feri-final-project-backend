@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class WorkPackageDto {
+    private UUID id;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
