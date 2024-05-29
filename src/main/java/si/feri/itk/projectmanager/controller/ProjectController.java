@@ -21,6 +21,7 @@ import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
+import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.PersonService;
@@ -80,4 +81,8 @@ public class ProjectController {
         return projectService.searchUsersProjects(pageInfo, sortInfo, searchParams, servletRequest);
     }
 
+    @GetMapping("/{projectId}/statistics")
+    public ProjectStatisticsResponse getProjectStatistics(@PathVariable @NotNull UUID projectId, HttpServletRequest servletRequest) {
+        return projectService.getProjectStatistics(projectId, servletRequest);
+    }
 }

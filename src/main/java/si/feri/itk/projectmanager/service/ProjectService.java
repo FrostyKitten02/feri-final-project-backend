@@ -6,11 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
-import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
@@ -30,6 +31,7 @@ import si.feri.itk.projectmanager.repository.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
+import si.feri.itk.projectmanager.util.StatisticUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
 import java.math.BigDecimal;
@@ -90,5 +92,12 @@ public class ProjectService {
         Page<ProjectList> projectsPage = projectListRepo.findAllByOwnerId(userId, PageInfo.toPageRequest(pageInfoRequest, sort));
         return ListProjectResponse.fromPage(projectsPage);
     }
+
+    public ProjectStatisticsResponse getProjectStatistics(UUID projectId, HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+        return StatisticUtil.calculateProjectStatistics(project);
+    }
+
 
 }

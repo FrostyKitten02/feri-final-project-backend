@@ -2,6 +2,7 @@ package si.feri.itk.projectmanager.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ public class Project extends BaseModel implements IProjectBudget {
     private String ownerId;//clerk id
     private LocalDate startDate;
     private LocalDate endDate;
-    @OneToMany(mappedBy = "projectId")
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.EAGER )
     private List<WorkPackage> workPackages;
 
     private UUID projectBudgetSchemaId;
