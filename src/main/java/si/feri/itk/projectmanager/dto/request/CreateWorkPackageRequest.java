@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.dto.request;
 
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,5 +16,7 @@ public class CreateWorkPackageRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isRelevant;
+    @Min(1)
+    private Long assignedPM;
     private UUID projectId;
 }

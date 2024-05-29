@@ -1,0 +1,3 @@
+ALTER TABLE work_package ADD COLUMN assigned_PM bigint NOT NULL DEFAULT 1;
+
+ALTER TABLE work_package ALTER COLUMN assigned_PM DROP DEFAULT;

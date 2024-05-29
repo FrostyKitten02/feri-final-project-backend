@@ -18,5 +18,6 @@ public class WorkPackageDto {
     private LocalDate endDate;
     private Boolean isRelevant;
     private UUID projectId;
+    private Long assignedPM;
     private List<TaskDto> tasks;
 }

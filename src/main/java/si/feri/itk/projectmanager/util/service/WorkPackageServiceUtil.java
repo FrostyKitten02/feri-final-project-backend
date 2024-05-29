@@ -25,6 +25,10 @@ public class WorkPackageServiceUtil {
             throw new BadRequestException("IsRelevant is required");
         }
 
+        if (request.getAssignedPM() == null || request.getAssignedPM() <= 0) {
+            throw new BadRequestException("Assigned PM is required, it must be a positive number");
+        }
+
         if (request.getStartDate() == null) {
             throw new BadRequestException("Start date is required");
         }
@@ -57,6 +61,7 @@ public class WorkPackageServiceUtil {
         workPackage.setIsRelevant(request.getIsRelevant());
         workPackage.setEndDate(request.getEndDate());
         workPackage.setProjectId(projectId);
+        workPackage.setAssignedPM(request.getAssignedPM());
         return workPackage;
     }
 
