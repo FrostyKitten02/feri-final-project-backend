@@ -11,6 +11,6 @@ import si.feri.itk.projectmanager.model.ProjectList;
 public  interface ProjectMapper {
     ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class);
     ProjectDto toDto(Project project);
-    @Mapping(target = "ownerId", ignore = true)
+
     ProjectDto toDto(ProjectList project);
 }
