@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.dto.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Digits;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProjectBudgetSchemaDto {
     private UUID id;
     private String name;
