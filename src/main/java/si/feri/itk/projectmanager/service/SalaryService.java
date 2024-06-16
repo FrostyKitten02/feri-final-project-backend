@@ -1,16 +1,20 @@
 package si.feri.itk.projectmanager.service;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.model.SalaryDto;
 import si.feri.itk.projectmanager.dto.request.CreateSalaryRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
+import si.feri.itk.projectmanager.exceptions.implementation.UnauthorizedException;
 import si.feri.itk.projectmanager.mapper.SalaryMapper;
 import si.feri.itk.projectmanager.model.person.Salary;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
+import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.service.SalaryServiceUtil;
 
 import java.time.LocalDate;
@@ -22,6 +26,8 @@ import java.util.UUID;
 public class SalaryService {
     private final SalaryRepo salaryRepo;
 
+    @Value("${admin-clerk-id}")
+    private String adminId;
     public SalaryDto getPersonCurrentSalary(UUID personId) {
         Optional<Salary> salaryOptional = salaryRepo.findLastByPersonId(personId);
         if (salaryOptional.isEmpty()) {
@@ -39,7 +45,12 @@ public class SalaryService {
 
 
     @Transactional
-    public UUID addSalaryToPerson(CreateSalaryRequest request) {
+    public UUID addSalaryToPerson(CreateSalaryRequest request, HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+
+        if (!userId.equals(adminId)) {
+            throw new UnauthorizedException("Permission denied");
+        }
         SalaryServiceUtil.validateCreateSalaryRequest(request);
 
         moveConflictingSalary(request);

@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,8 +22,8 @@ public class PersonTypeController {
     private final PersonTypeService personTypeService;
 
     @PostMapping
-    public ResourceCreatedResponse createPersonType(@RequestBody CreatePersonTypeRequest request, HttpServletResponse servletResponse) {
-        UUID personTypeId = personTypeService.createPersonType(request);
+    public ResourceCreatedResponse createPersonType(@RequestBody CreatePersonTypeRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        UUID personTypeId = personTypeService.createPersonType(request, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
         ResourceCreatedResponse response = new ResourceCreatedResponse();
         response.setId(personTypeId);
