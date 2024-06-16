@@ -38,7 +38,7 @@ public class OccupancyController {
     }
 
 
-    @PatchMapping("/{occupancyId}")
+    @PatchMapping
     public void updateOccupancy(@RequestBody UpdateOccupancyRequest request, HttpServletRequest servletRequest) {
         occupancyService.updateOccupancy(request, servletRequest);
     }
