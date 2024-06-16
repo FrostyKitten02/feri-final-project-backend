@@ -1,6 +1,8 @@
 package si.feri.itk.projectmanager.util;
 
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class DateUtil {
     private DateUtil() {}
@@ -24,6 +26,15 @@ public class DateUtil {
     //true if startDate month is after endDate
     public static boolean isMonthAfter(LocalDate startDate, LocalDate endDate) {
         return startDate.getYear() > endDate.getYear() || (startDate.getYear() == endDate.getYear() && startDate.getMonthValue() > endDate.getMonthValue());
+    }
+
+    public static int calculateMonthMaxDay(LocalDate date) {
+        return calculateMonthMaxDay(date.getMonthValue(), date.getYear());
+    }
+
+    public static int calculateMonthMaxDay(int month, int year) {
+        Calendar calendar = new GregorianCalendar(year, month - 1, 1);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import si.feri.itk.projectmanager.model.person.Salary;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,4 +26,18 @@ public interface SalaryRepo extends JpaRepository<Salary, UUID> {
             "ORDER BY s.startDate DESC " +
             "LIMIT 1")
     Optional<Salary> findLastByPersonId(UUID personId);
+
+
+    @Query("SELECT s " +
+            "FROM Salary s " +
+            "WHERE (" +
+            "   (" +
+            "       month(s.endDate) = :month " +
+            "       AND year(s.endDate) = :year" +
+            "   ) " +
+            "   OR s.endDate IS NULL" +
+            ") " +
+            "AND s.personId = :personId " +
+            "ORDER BY s.endDate asc" )
+    List<Salary> getPersonActiveSalariesInMonth(int month, int year, UUID personId);
 }

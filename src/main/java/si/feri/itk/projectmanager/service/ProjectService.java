@@ -11,6 +11,8 @@ import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.statistics.PersonWorkDto;
+import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
@@ -21,20 +23,25 @@ import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.model.ProjectList;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
+import si.feri.itk.projectmanager.model.person.Salary;
 import si.feri.itk.projectmanager.paging.PageInfo;
 import si.feri.itk.projectmanager.paging.SortInfo;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
+import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
 import si.feri.itk.projectmanager.repository.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
+import si.feri.itk.projectmanager.repository.SalaryRepo;
 import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StatisticUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +50,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProjectService {
     private final PersonRepo personRepo;
+    private final SalaryRepo salaryRepo;
     private final ProjectRepo projectRepo;
+    private final OccupancyRepo occupancyRepo;
     private final ProjectListRepo projectListRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
     private final ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
@@ -96,8 +105,34 @@ public class ProjectService {
     public ProjectStatisticsResponse getProjectStatistics(UUID projectId, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
-        return StatisticUtil.calculateProjectStatistics(project);
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project);
+        calculateProjectSalaryStats(stats, personRepo.findAllByProjectId(projectId), projectId);
+        return stats;
     }
 
+
+    private void calculateProjectSalaryStats(ProjectStatisticsResponse response, List<Person> people, UUID projectId) {
+        for (ProjectMonthDto month : response.getMonths()) {
+            ArrayList<PersonWorkDto> personWorkDtos = new ArrayList<>(people.size());
+            for (Person p : people) {
+                PersonWorkDto personWorkDto = new PersonWorkDto();
+                personWorkDto.setPersonId(p.getId());
+                personWorkDto.setTotalWorkPm(occupancyRepo.sumAllByMonthAndPersonIdAnProjectId(month.getDate(), p.getId(), projectId).orElse(BigDecimal.ZERO));
+                personWorkDto.setAvgSalary(calculateAvgSalaryForMonth(month, p.getId()));
+
+                month.addWorkPm(personWorkDto.getTotalWorkPm());
+                month.addActualSpending(personWorkDto.getAvgSalary().multiply(personWorkDto.getTotalWorkPm()));
+
+                personWorkDtos.add(personWorkDto);
+            }
+            //TODO maybe check if size the same as people size!!!
+            month.setPersonWork(personWorkDtos);
+        }
+    }
+
+    private BigDecimal calculateAvgSalaryForMonth(ProjectMonthDto month, UUID personId) {
+        List<Salary> salaries = salaryRepo.getPersonActiveSalariesInMonth(month.getDate().getMonthValue(), month.getDate().getYear(), personId);
+        return StatisticUtil.calculateAvgMonthSalary(salaries, month.getDate().getMonthValue(), month.getDate().getYear());
+    }
 
 }
