@@ -19,7 +19,6 @@ import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.service.TaskServiceUtil;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
