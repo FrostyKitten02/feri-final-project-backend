@@ -1,0 +1,1 @@
+ALTER TABLE occupancy ADD CONSTRAINT occupancy_unique_person_project_month UNIQUE (person_id, project_id, month);

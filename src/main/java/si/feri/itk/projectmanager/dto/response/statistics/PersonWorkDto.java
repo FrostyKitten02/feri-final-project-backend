@@ -10,6 +10,7 @@ import java.util.UUID;
 @Setter
 public class PersonWorkDto {
     private UUID personId;
+    private UUID occupancyId;
     private BigDecimal totalWorkPm;
     private BigDecimal avgSalary;
 }

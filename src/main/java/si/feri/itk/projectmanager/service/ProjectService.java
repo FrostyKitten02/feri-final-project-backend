@@ -18,6 +18,7 @@ import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
+import si.feri.itk.projectmanager.model.Occupancy;
 import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.model.ProjectList;
@@ -117,15 +118,21 @@ public class ProjectService {
             for (Person p : people) {
                 PersonWorkDto personWorkDto = new PersonWorkDto();
                 personWorkDto.setPersonId(p.getId());
-                personWorkDto.setTotalWorkPm(occupancyRepo.sumAllByMonthAndPersonIdAnProjectId(month.getDate(), p.getId(), projectId).orElse(BigDecimal.ZERO));
+                Optional<Occupancy> occupancyOpt = occupancyRepo.findByMonthAndPersonIdAndProjectId(month.getDate(), p.getId(), projectId);
+                if (occupancyOpt.isPresent()) {
+                    Occupancy occupancy = occupancyOpt.get();
+                    personWorkDto.setOccupancyId(occupancy.getId());
+                    personWorkDto.setTotalWorkPm(occupancy.getValue());
+                } else {
+                    personWorkDto.setOccupancyId(null);
+                    personWorkDto.setTotalWorkPm(BigDecimal.ZERO);
+                }
                 personWorkDto.setAvgSalary(calculateAvgSalaryForMonth(month, p.getId()));
-
                 month.addWorkPm(personWorkDto.getTotalWorkPm());
                 month.addActualSpending(personWorkDto.getAvgSalary().multiply(personWorkDto.getTotalWorkPm()));
 
                 personWorkDtos.add(personWorkDto);
             }
-            //TODO maybe check if size the same as people size!!!
             month.setPersonWork(personWorkDtos);
         }
     }
