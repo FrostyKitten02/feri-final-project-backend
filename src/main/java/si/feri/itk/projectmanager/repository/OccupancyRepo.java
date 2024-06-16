@@ -28,10 +28,9 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
             "AND o.personId = :personId")
     BigDecimal sumAllByMonthAndPersonId(LocalDate month, UUID personId);
 
-    @Query("SELECT SUM(o.value) FROM Occupancy o " +
+    @Query("SELECT o FROM Occupancy o " +
             "WHERE o.month = :month " +
             "AND o.personId = :personId " +
             "AND o.projectId = :projectId ")
-    Optional<BigDecimal> sumAllByMonthAndPersonIdAnProjectId(LocalDate month, UUID personId, UUID projectId);
-
+    Optional<Occupancy> findByMonthAndPersonIdAndProjectId(LocalDate month, UUID personId, UUID projectId);
 }
