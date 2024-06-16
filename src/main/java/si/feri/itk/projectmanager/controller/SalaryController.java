@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,9 +22,9 @@ import java.util.UUID;
 public class SalaryController {
     private final SalaryService salaryService;
     @PostMapping
-    public ResourceCreatedResponse createSalaryForPerson(@RequestBody CreateSalaryRequest request, HttpServletResponse servletResponse) {
+    public ResourceCreatedResponse createSalaryForPerson(@RequestBody CreateSalaryRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         ResourceCreatedResponse response = new ResourceCreatedResponse();
-        UUID salaryId = salaryService.addSalaryToPerson(request);
+        UUID salaryId = salaryService.addSalaryToPerson(request, servletRequest);
         response.setId(salaryId);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
         return response;
