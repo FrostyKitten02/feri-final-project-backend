@@ -31,7 +31,7 @@ public class OccupancyServiceUtil {
             throw new BadRequestException("Project id is required.");
         }
 
-        if (request.getValue() == null || request.getValue().compareTo(BigDecimal.ZERO) >= 0) {
+        if (request.getValue() == null || request.getValue().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BadRequestException("Value is required.");
         }
     }

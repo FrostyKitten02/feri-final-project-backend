@@ -9,6 +9,7 @@ import si.feri.itk.projectmanager.mapper.WorkPackageMapper;
 import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
+import si.feri.itk.projectmanager.model.person.Salary;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -47,6 +48,30 @@ public class StatisticUtil {
         projectStatisticsResponse.setWorkPackages(wpWithStatsList);
         projectStatisticsResponse.setMonths(projectMonthDtos);
         return projectStatisticsResponse;
+    }
+
+    public static BigDecimal calculateAvgMonthSalary(List<Salary> salaries, int monthNumber, int yearNumber) {
+        final int maxDays = DateUtil.calculateMonthMaxDay(monthNumber, yearNumber);
+        int fromDay = 1;
+        BigDecimal sum = BigDecimal.ZERO;
+        for (Salary s : salaries) {
+            if (s.getEndDate() != null && s.getEndDate().getMonthValue() != monthNumber) {
+                throw new InternalServerException("Error creating salary statistics");
+            }
+            final int salaryEndDate;
+            if (s.getEndDate() == null) {
+                salaryEndDate = maxDays;
+            } else {
+                salaryEndDate = s.getEndDate().getDayOfMonth();
+            }
+
+
+            final int salaryDays = salaryEndDate - fromDay;
+            fromDay = salaryEndDate + 1;
+            sum = sum.add(s.getAmount().multiply(BigDecimal.valueOf(salaryDays)));
+        }
+
+        return sum.divide(BigDecimal.valueOf(maxDays), RoundingMode.CEILING);
     }
 
     private static void addTasksBurnDownToProjectMonths(List<Task> tasks, List<ProjectMonthDto> projectMonthDtos, BigDecimal pmBurnDownRatePerTask) {

@@ -9,6 +9,7 @@ import si.feri.itk.projectmanager.model.Occupancy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -26,5 +27,11 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
             "WHERE o.month = :month " +
             "AND o.personId = :personId")
     BigDecimal sumAllByMonthAndPersonId(LocalDate month, UUID personId);
+
+    @Query("SELECT SUM(o.value) FROM Occupancy o " +
+            "WHERE o.month = :month " +
+            "AND o.personId = :personId " +
+            "AND o.projectId = :projectId ")
+    Optional<BigDecimal> sumAllByMonthAndPersonIdAnProjectId(LocalDate month, UUID personId, UUID projectId);
 
 }
