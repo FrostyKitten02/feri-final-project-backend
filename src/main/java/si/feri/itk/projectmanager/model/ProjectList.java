@@ -21,4 +21,7 @@ public class ProjectList {
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
+
+    private Integer peopleCount;
+    private Integer workPackageCount;
 }

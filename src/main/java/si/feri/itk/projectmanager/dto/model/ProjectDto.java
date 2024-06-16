@@ -25,6 +25,10 @@ public class ProjectDto implements IProjectBudget {
     private List<WorkPackageDto> workPackages;
     private UUID projectBudgetSchemaId;
 
+    //returned from project_list_view
+    private Integer peopleCount;
+    private Integer workPackageCount;
+
     //budget
     @Digits(integer = 8, fraction = 2)
     private BigDecimal staffBudget;
