@@ -23,6 +23,7 @@ import java.util.UUID;
 public class PersonController {
     private final PersonService personService;
     private final SalaryService salaryService;
+
     @GetMapping("/{personId}")
     public GetPersonResponse getPersonById(@PathVariable UUID personId, HttpServletRequest servletRequest) {
         PersonDto person = personService.getPersonById(personId);

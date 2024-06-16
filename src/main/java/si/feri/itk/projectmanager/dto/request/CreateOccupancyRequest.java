@@ -8,14 +8,18 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
-public class AddPersonToTaskRequest {
-    @Deprecated
+public class CreateOccupancyRequest {
+    private UUID personId;
+    private UUID projectId;
+
+    private LocalDate fromMonth;
+    private LocalDate toMonth;
+
     @DecimalMax(value = "1.000")
     @DecimalMin(value = "0.001")
-    private BigDecimal occupancy;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private BigDecimal value;
 }
