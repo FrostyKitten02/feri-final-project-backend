@@ -1,0 +1,84 @@
+package si.feri.itk.projectmanager.repository.projectlist;
+
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.Querydsl;
+import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
+import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
+import si.feri.itk.projectmanager.model.ProjectList;
+import si.feri.itk.projectmanager.model.QProjectList;
+import si.feri.itk.projectmanager.model.person.QPerson;
+import si.feri.itk.projectmanager.model.person.QPersonOnProject;
+import si.feri.itk.projectmanager.repository.QuerydslParent;
+import si.feri.itk.projectmanager.util.StringUtil;
+
+import java.util.UUID;
+
+
+public class CustomProjectListRepoImpl extends QuerydslParent implements CustomProjectListRepo {
+    public CustomProjectListRepoImpl() {
+        super(ProjectList.class);
+    }
+
+    @Override
+    public Page<ProjectList> searchUsersProjects(ProjectListSearchParams searchParams, String userId, Pageable pageable) {
+        if (userId == null) {
+            throw new InternalServerException("User id missing!");
+        }
+
+        QProjectList qProjectList = QProjectList.projectList;
+        BooleanBuilder restrictions = new BooleanBuilder();
+
+        BooleanBuilder projectIdRestrictions = createProjectIdRestrictions(searchParams.getSearchOnlyOwnedProjects(), qProjectList, userId);
+        restrictions.and(projectIdRestrictions);
+
+        final String searchString = searchParams.getSearchStr();
+        if (!StringUtil.isNullOrEmpty(searchString)) {
+           BooleanBuilder searchStringRestrictions = createSearchStringRestrictions(searchString, qProjectList);
+           restrictions.and(searchStringRestrictions);
+        }
+
+        Querydsl querydsl = getQuerydsl();
+        JPAQuery<ProjectList> query = querydsl.<ProjectList>createQuery()
+                .from(qProjectList)
+                .where(restrictions);
+        querydsl.applySorting(pageable.getSort(), query);
+        return getPage(query, pageable);
+    }
+
+    private BooleanBuilder createSearchStringRestrictions(String searchString, QProjectList qProjectList) {
+        BooleanBuilder searchStringRestrictions = new BooleanBuilder();
+        for (String ss : searchString.split(" ")) {
+            searchStringRestrictions.or(qProjectList.title.containsIgnoreCase(ss));
+            searchStringRestrictions.or(qProjectList.title.in(ss));
+        }
+        return searchStringRestrictions;
+    }
+
+    private BooleanBuilder createProjectIdRestrictions(Boolean searchOnlyOwnedProjects, QProjectList qProjectList, String userId) {
+        BooleanBuilder projectIdRestrictions = new BooleanBuilder();
+        if (searchOnlyOwnedProjects != null && !searchOnlyOwnedProjects) {
+            //getting person id by userId
+            QPerson qperson = QPerson.person;
+            JPQLQuery<UUID> personIdSubquery = JPAExpressions.select(qperson.id)
+                    .from(qperson)
+                    .where(qperson.clerkId.eq(userId))
+                    .limit(1);
+
+            //getting all project ids where person is on project
+            QPersonOnProject qPersonOnProject = QPersonOnProject.personOnProject;
+            JPQLQuery<UUID> projectIdsSubquery = JPAExpressions.select(qPersonOnProject.projectId)
+                    .from(qPersonOnProject)
+                    .where(qPersonOnProject.personId.eq(personIdSubquery));
+
+            projectIdRestrictions.or(qProjectList.id.in(projectIdsSubquery));
+        }
+        projectIdRestrictions.or(qProjectList.ownerId.eq(userId));
+        return projectIdRestrictions;
+    }
+
+}

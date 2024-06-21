@@ -17,7 +17,7 @@ import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
-import si.feri.itk.projectmanager.repository.ProjectListRepo;
+import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 
 import java.math.BigDecimal;

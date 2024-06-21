@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class ProjectListSearchParams {
     private String searchStr;
+    private Boolean searchOnlyOwnedProjects;
 }

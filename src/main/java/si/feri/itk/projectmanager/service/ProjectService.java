@@ -32,7 +32,7 @@ import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
-import si.feri.itk.projectmanager.repository.ProjectListRepo;
+import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
 import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
@@ -99,7 +99,7 @@ public class ProjectService {
         //todo use search params!!!
         SortInfo<?> sort = RequestUtil.getSortInfoFromRequest(sortInfoRequest);
         String userId = RequestUtil.getUserIdStrict(servletRequest);
-        Page<ProjectList> projectsPage = projectListRepo.findAllByOwnerId(userId, PageInfo.toPageRequest(pageInfoRequest, sort));
+        Page<ProjectList> projectsPage = projectListRepo.searchUsersProjects(searchParams, userId, PageInfo.toPageRequest(pageInfoRequest, sort));
         return ListProjectResponse.fromPage(projectsPage);
     }
 
