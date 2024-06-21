@@ -61,7 +61,8 @@ public class CustomProjectListRepoImpl extends QuerydslParent implements CustomP
 
     private BooleanBuilder createProjectIdRestrictions(Boolean searchOnlyOwnedProjects, QProjectList qProjectList, String userId) {
         BooleanBuilder projectIdRestrictions = new BooleanBuilder();
-        if (searchOnlyOwnedProjects != null && !searchOnlyOwnedProjects) {
+        //searching owned only when parameter is explicitly set to true
+        if (searchOnlyOwnedProjects == null || !searchOnlyOwnedProjects) {
             //getting person id by userId
             QPerson qperson = QPerson.person;
             JPQLQuery<UUID> personIdSubquery = JPAExpressions.select(qperson.id)
