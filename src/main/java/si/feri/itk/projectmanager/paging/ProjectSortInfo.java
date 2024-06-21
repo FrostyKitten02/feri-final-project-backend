@@ -25,11 +25,11 @@ public class ProjectSortInfo extends SortInfo<ProjectSortInfo.Field> {
     }
 
     public ProjectSortInfo(List<Field> fields, boolean ascending) {
-        super(ascending, fields, Field.TITLE);
+        super(ascending, fields, Field.CREATED_AT);
     }
 
     public ProjectSortInfo() {
-        super(true, null, Field.TITLE);
+        super(true, null, Field.CREATED_AT);
     }
 
     public static ProjectSortInfo fromPage(Page<?> page) {
@@ -54,7 +54,9 @@ public class ProjectSortInfo extends SortInfo<ProjectSortInfo.Field> {
 
     public enum Field implements IField {
         CREATED_AT("createdAt"),
-        TITLE("title");
+        TITLE("title"),
+        START_DATE("startDate"),
+        END_DATE("endDate");
         @Getter
         private final String columnName;
         Field(String columnName) {
