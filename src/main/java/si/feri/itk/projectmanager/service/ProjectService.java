@@ -96,7 +96,6 @@ public class ProjectService {
     }
 
     public ListProjectResponse searchUsersProjects(PageInfoRequest pageInfoRequest, ProjectSortInfoRequest sortInfoRequest, ProjectListSearchParams searchParams, HttpServletRequest servletRequest) {
-        //todo use search params!!!
         SortInfo<?> sort = RequestUtil.getSortInfoFromRequest(sortInfoRequest);
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Page<ProjectList> projectsPage = projectListRepo.searchUsersProjects(searchParams, userId, PageInfo.toPageRequest(pageInfoRequest, sort));
