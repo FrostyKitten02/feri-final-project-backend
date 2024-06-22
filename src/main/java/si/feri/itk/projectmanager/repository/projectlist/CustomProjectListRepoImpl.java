@@ -16,6 +16,7 @@ import si.feri.itk.projectmanager.model.person.QPersonOnProject;
 import si.feri.itk.projectmanager.repository.QuerydslParent;
 import si.feri.itk.projectmanager.util.StringUtil;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 
@@ -35,6 +36,9 @@ public class CustomProjectListRepoImpl extends QuerydslParent implements CustomP
 
         BooleanBuilder projectIdRestrictions = createProjectIdRestrictions(searchParams.getSearchOnlyOwnedProjects(), qProjectList, userId);
         restrictions.and(projectIdRestrictions);
+
+        BooleanBuilder projectDatesRestrictions = createProjectDatesRestrictions(searchParams, qProjectList);
+        restrictions.and(projectDatesRestrictions);
 
         final String searchString = searchParams.getSearchStr();
         if (!StringUtil.isNullOrEmpty(searchString)) {
@@ -80,6 +84,32 @@ public class CustomProjectListRepoImpl extends QuerydslParent implements CustomP
         }
         projectIdRestrictions.or(qProjectList.ownerId.eq(userId));
         return projectIdRestrictions;
+    }
+
+    private BooleanBuilder createProjectDatesRestrictions(ProjectListSearchParams searchParams, QProjectList qProjectList) {
+        BooleanBuilder projectDatesRestrictions = new BooleanBuilder();
+
+        LocalDate startFrom = searchParams.getStartDateFrom();
+        if (startFrom != null) {
+            projectDatesRestrictions.and(qProjectList.startDate.goe(startFrom));
+        }
+
+        LocalDate startTo = searchParams.getStartDateTo();
+        if (startTo != null) {
+            projectDatesRestrictions.and(qProjectList.startDate.loe(startTo));
+        }
+
+        LocalDate endFrom = searchParams.getEndDateFrom();
+        if (endFrom != null) {
+            projectDatesRestrictions.and(qProjectList.endDate.goe(endFrom));
+        }
+
+        LocalDate endTo = searchParams.getEndDateTo();
+        if (endTo != null) {
+            projectDatesRestrictions.and(qProjectList.endDate.loe(endTo));
+        }
+
+        return projectDatesRestrictions;
     }
 
 }
