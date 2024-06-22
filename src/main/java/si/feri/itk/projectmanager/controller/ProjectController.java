@@ -20,6 +20,7 @@ import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.ProjectListStatusResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
@@ -85,4 +86,10 @@ public class ProjectController {
     public ProjectStatisticsResponse getProjectStatistics(@PathVariable @NotNull UUID projectId, HttpServletRequest servletRequest) {
         return projectService.getProjectStatistics(projectId, servletRequest);
     }
+
+    @GetMapping("/list/status")
+    public ProjectListStatusResponse listProjectsStatus(HttpServletRequest servletRequest) {
+        return projectService.listProjectsStatus(servletRequest);
+    }
+
 }
