@@ -5,12 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.ProjectListStatusResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.PersonWorkDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
@@ -41,6 +43,7 @@ import si.feri.itk.projectmanager.util.StatisticUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +111,35 @@ public class ProjectService {
         ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project);
         calculateProjectSalaryStats(stats, personRepo.findAllByProjectId(projectId), projectId);
         return stats;
+    }
+
+    public ProjectListStatusResponse listProjectsStatus(HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        LocalDate today = LocalDate.now();
+
+        PageInfo pageInfo = new PageInfo(1, 0L, 1);
+        Pageable pageable = PageInfo.toPageRequest(pageInfo, null);
+
+        ProjectListStatusResponse response = new ProjectListStatusResponse();
+        ProjectListSearchParams searchParams = new ProjectListSearchParams();
+
+        searchParams.setEndDateTo(today);
+        Page<ProjectList> finishedProjects = projectListRepo.searchUsersProjects(searchParams, userId, pageable);
+        response.setFinishedProjects(finishedProjects.getTotalElements());
+
+        searchParams.setEndDateTo(null);
+        searchParams.setEndDateFrom(today);
+        searchParams.setStartDateTo(today);
+        Page<ProjectList> inProgressProjects = projectListRepo.searchUsersProjects(searchParams, userId, pageable);
+        response.setInProgressProjects(inProgressProjects.getTotalElements());
+
+        searchParams.setEndDateFrom(null);
+        searchParams.setStartDateTo(null);
+        searchParams.setStartDateFrom(today.plusDays(1));
+        Page<ProjectList> scheduledProjects = projectListRepo.searchUsersProjects(searchParams, userId, pageable);
+        response.setScheduledProjects(scheduledProjects.getTotalElements());
+
+        return response;
     }
 
 
