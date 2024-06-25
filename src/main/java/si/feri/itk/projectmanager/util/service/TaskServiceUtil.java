@@ -13,6 +13,7 @@ import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 public class TaskServiceUtil {
@@ -22,6 +23,8 @@ public class TaskServiceUtil {
         if (!task.getWorkPackageId().equals(taskWp.getId())) {
             throw new InternalServerException("Task work package id does not match work package id");
         }
+
+        DateUtil.validateDurationStrict(request);
 
         if (request.getTitle() != null) {
             task.setTitle(request.getTitle());
