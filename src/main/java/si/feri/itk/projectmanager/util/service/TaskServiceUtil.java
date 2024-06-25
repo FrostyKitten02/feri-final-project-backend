@@ -2,7 +2,9 @@ package si.feri.itk.projectmanager.util.service;
 
 import si.feri.itk.projectmanager.dto.request.AddPersonToTaskRequest;
 import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.UpdateTaskRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
+import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.model.PersonOnTask;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
@@ -15,6 +17,30 @@ import java.util.UUID;
 
 public class TaskServiceUtil {
     private TaskServiceUtil() {}
+
+    public static void updateTask(Task task, WorkPackage taskWp, UpdateTaskRequest request) {
+        if (!task.getWorkPackageId().equals(taskWp.getId())) {
+            throw new InternalServerException("Task work package id does not match work package id");
+        }
+
+        if (request.getTitle() != null) {
+            task.setTitle(request.getTitle());
+        }
+
+        if (request.getIsRelevant() != null) {
+            task.setIsRelevant(request.getIsRelevant());
+        }
+
+        if (request.getStartDate() != null) {
+            task.setStartDate(request.getStartDate());
+        }
+
+        if (request.getEndDate() != null) {
+            task.setEndDate(request.getEndDate());
+        }
+
+        validateTaskBounds(task, taskWp);
+    }
 
     public static void validateCreateTaskRequest(CreateTaskRequest request) {
         if (request.getWorkPackageId() == null) {
