@@ -27,4 +27,13 @@ public interface ProjectRepo extends JpaRepository<Project, UUID> {
             " )" +
             "AND p.ownerId = :ownerId")
     Optional<Project> findProjectByTaskIdAndOwnerId(UUID taskId, String ownerId);
+
+    @Query("select p from Project as p " +
+            "where p.id = (" +
+            "   select wp.projectId " +
+            "   from WorkPackage as wp " +
+            "   where wp.id = :workPackageId " +
+            "   )" +
+            "AND p.ownerId = :ownerId")
+    Optional<Project> findProjectByWorkPackageIdAndOwnerId(UUID workPackageId, String ownerId);
 }
