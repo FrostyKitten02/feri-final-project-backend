@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import si.feri.itk.projectmanager.dto.common.Duration;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,14 @@ public class DateUtilTest {
 
         between = DateUtil.getMonthsBetweenDates(start, finish);
         Assertions.assertEquals(2, between);
+    }
+
+    @Test
+    public void testValidateDurationStrict() {
+        Duration d = new Duration();
+        d.setStartDate(LocalDate.now());
+        d.setEndDate(LocalDate.now());
+        Assertions.assertDoesNotThrow(()->DateUtil.validateDurationStrict(d));
     }
 
 

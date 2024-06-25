@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,10 +19,12 @@ import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.GetPeopleResponse;
-import si.feri.itk.projectmanager.dto.response.GetProjectResponse;
-import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
-import si.feri.itk.projectmanager.dto.response.ProjectListStatusResponse;
+import si.feri.itk.projectmanager.dto.response.project.GetProjectResponse;
+import si.feri.itk.projectmanager.dto.response.project.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.project.ProjectListStatusResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
+import si.feri.itk.projectmanager.dto.response.project.UpdateProjectRequest;
+import si.feri.itk.projectmanager.dto.response.project.UpdateProjectResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.sortinforequest.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
@@ -44,6 +47,14 @@ public class ProjectController {
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
         ResourceCreatedResponse response = new ResourceCreatedResponse();
         response.setId(project);
+        return response;
+    }
+
+    @PatchMapping("/{projectId}")
+    public UpdateProjectResponse updateProject(@PathVariable UUID projectId, @RequestBody UpdateProjectRequest request, HttpServletRequest servletRequest) {
+        ProjectDto project = projectService.updateProject(projectId, request, servletRequest);
+        UpdateProjectResponse response = new UpdateProjectResponse();
+        response.setProject(project);
         return response;
     }
 

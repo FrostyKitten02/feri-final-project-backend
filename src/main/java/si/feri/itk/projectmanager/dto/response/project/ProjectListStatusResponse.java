@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.response;
+package si.feri.itk.projectmanager.dto.response.project;
 
 
 import lombok.Getter;

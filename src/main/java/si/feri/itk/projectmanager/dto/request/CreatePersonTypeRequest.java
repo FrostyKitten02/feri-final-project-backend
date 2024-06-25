@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import lombok.Getter;
 import lombok.Setter;
+import si.feri.itk.projectmanager.dto.common.IDuration;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class CreatePersonTypeRequest {
+public class CreatePersonTypeRequest implements IDuration {
     private String name;
 
     @DecimalMax(value = "1.00")

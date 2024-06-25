@@ -33,4 +33,14 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
             "AND o.personId = :personId " +
             "AND o.projectId = :projectId ")
     Optional<Occupancy> findByMonthAndPersonIdAndProjectId(LocalDate month, UUID personId, UUID projectId);
+
+    @Query("SELECT MIN(o.month) " +
+            "FROM Occupancy o " +
+            "WHERE o.projectId = :projectId ")
+    Optional<LocalDate> findEarliestMonthByProjectId(UUID projectId);
+
+    @Query("SELECT MAX(o.month) " +
+            "FROM Occupancy o " +
+            "WHERE o.projectId = :projectId ")
+    Optional<LocalDate> findLatestMonthByProjectId(UUID projectId);
 }

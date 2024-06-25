@@ -6,6 +6,7 @@ import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.model.PersonOnTask;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
+import si.feri.itk.projectmanager.util.DateUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
@@ -36,9 +37,7 @@ public class TaskServiceUtil {
             throw new BadRequestException("End date is required");
         }
 
-        if (request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BadRequestException("Start date must be before end date");
-        }
+        DateUtil.validateDurationStrict(request);
     }
 
     public static void validateTaskBounds(Task task, WorkPackage workPackage) {
