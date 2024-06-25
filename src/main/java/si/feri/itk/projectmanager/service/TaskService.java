@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.request.AddPersonToTaskRequest;
 import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.UpdateTaskRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.model.PersonOnTask;
@@ -31,6 +32,17 @@ public class TaskService {
     private final ProjectRepo projectRepo;
     private final WorkPackageRepo workPackageRepo;
     private final PersonOnTaskRepo personOnTaskRepo;
+
+    public void updateTask(UUID taskId, UpdateTaskRequest updateTaskRequest, HttpServletRequest servletRequest) {
+        final String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findProjectByTaskIdAndOwnerId(taskId, userId).orElseThrow(() -> new BadRequestException("Invalid task id"));
+
+        Task task = taskRepo.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task not found"));
+        WorkPackage workPackage = workPackageRepo.findById(task.getWorkPackageId()).orElseThrow(() -> new ItemNotFoundException("Work package not found"));
+
+        TaskServiceUtil.updateTask(task, workPackage, updateTaskRequest);
+        taskRepo.save(task);
+    }
 
     public UUID createTask(CreateTaskRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
