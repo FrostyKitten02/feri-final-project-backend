@@ -7,12 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import si.feri.itk.projectmanager.dto.common.Duration;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.ProjectListSearchParams;
-import si.feri.itk.projectmanager.dto.response.ListProjectResponse;
-import si.feri.itk.projectmanager.dto.response.ProjectListStatusResponse;
+import si.feri.itk.projectmanager.dto.response.project.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.project.ProjectListStatusResponse;
+import si.feri.itk.projectmanager.dto.response.project.UpdateProjectRequest;
+import si.feri.itk.projectmanager.dto.response.project.UpdateProjectResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.PersonWorkDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
@@ -34,6 +37,7 @@ import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
+import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
@@ -57,6 +61,7 @@ public class ProjectService {
     private final SalaryRepo salaryRepo;
     private final ProjectRepo projectRepo;
     private final OccupancyRepo occupancyRepo;
+    private final WorkPackageRepo workPackageRepo;
     private final ProjectListRepo projectListRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
     private final ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
@@ -69,6 +74,50 @@ public class ProjectService {
 
         Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
         return projectRepo.save(project).getId();
+    }
+
+    public ProjectDto updateProject(UUID projectId, UpdateProjectRequest request, HttpServletRequest servletRequest) {
+        ProjectServiceUtil.validateUpdateProjectRequest(request, projectId);
+        final String userId = RequestUtil.getUserIdStrict(servletRequest);
+        final Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+
+        final Duration wpDuration = createWpStartAndEndDates(projectId);
+        final Duration occupancyDuration = createOccupancyStartAndEndDates(projectId);
+
+        final ProjectBudgetSchema schema;
+        if (request.getProjectBudgetSchemaId() != null) {
+            schema = projectBudgetSchemaRepo.findById(request.getProjectBudgetSchemaId()).orElseThrow(() -> new ItemNotFoundException("Project budget schema not found"));
+        } else {
+            schema = projectBudgetSchemaRepo.findById(project.getProjectBudgetSchemaId()).orElseThrow(() -> new ItemNotFoundException("Project budget schema not found"));
+        }
+
+        ProjectServiceUtil.updateProject(request, project, schema, wpDuration, occupancyDuration);
+        final Project savedProject = projectRepo.save(project);
+        return ProjectMapper.INSTANCE.toDto(savedProject);
+    }
+
+    private Duration createWpStartAndEndDates(UUID projectId) {
+        Duration wpDuration = new Duration();
+        workPackageRepo.findFirstWorkPackageStartDateByProjectId(projectId)
+                .ifPresent(wpDuration::setStartDate);
+        workPackageRepo.findLastWorkPackageEndDateByProjectId(projectId)
+                .ifPresent(wpDuration::setEndDate);
+        return wpDuration;
+    }
+
+    private Duration createOccupancyStartAndEndDates(UUID projectId) {
+        Duration occupancyDuration = new Duration();
+        //we set dates we get from db to last day of month
+        //we can add 1 month and remove 1 day bcs dates in this table SHOULD ALWAYS BE first day of the month
+        occupancyRepo.findEarliestMonthByProjectId(projectId)
+                .ifPresent(o->{
+                    occupancyDuration.setStartDate(o.plusMonths(1).minusDays(1));
+                });
+        occupancyRepo.findLatestMonthByProjectId(projectId)
+                .ifPresent(o->{
+                    occupancyDuration.setEndDate(o.plusMonths(1).minusDays(1));
+                });
+        return occupancyDuration;
     }
 
     public ProjectDto getProjectById(UUID projectId, HttpServletRequest servletRequest) {

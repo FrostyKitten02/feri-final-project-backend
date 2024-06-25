@@ -3,10 +3,12 @@ package si.feri.itk.projectmanager.util.service;
 import si.feri.itk.projectmanager.dto.request.CreatePersonTypeRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.model.person.PersonType;
+import si.feri.itk.projectmanager.util.DateUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 
 public class PersonTypeServiceUtil {
     private PersonTypeServiceUtil() {}
@@ -37,9 +39,7 @@ public class PersonTypeServiceUtil {
             throw new BadRequestException("Start date is required");
         }
 
-        if (request.getEndDate() != null && request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BadRequestException("End date must be after start date");
-        }
+        DateUtil.validateDurationStrict(request);
     }
 
     public static BigDecimal calculateMaxAvailability(CreatePersonTypeRequest request) {

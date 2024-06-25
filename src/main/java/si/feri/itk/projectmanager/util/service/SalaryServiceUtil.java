@@ -3,6 +3,7 @@ package si.feri.itk.projectmanager.util.service;
 import si.feri.itk.projectmanager.dto.request.CreateSalaryRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.model.person.Salary;
+import si.feri.itk.projectmanager.util.DateUtil;
 
 import java.math.BigDecimal;
 
@@ -22,9 +23,7 @@ public class SalaryServiceUtil {
             throw new BadRequestException("Star date is required");
         }
 
-        if (request.getEndDate() != null && request.getStartDate().isAfter(request.getEndDate())) {
-            throw new BadRequestException("End date must be after start date!");
-        }
+        DateUtil.validateDurationStrict(request);
     }
 
     public static Salary createSalary(CreateSalaryRequest createSalary) {

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Digits;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import si.feri.itk.projectmanager.dto.common.IDuration;
 import si.feri.itk.projectmanager.interfaces.IProjectBudget;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ProjectDto implements IProjectBudget {
+public class ProjectDto implements IProjectBudget, IDuration {
     private UUID id;
     private String title;
     private String ownerId;

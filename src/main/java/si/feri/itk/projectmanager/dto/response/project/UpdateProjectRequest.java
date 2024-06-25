@@ -1,9 +1,8 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.response.project;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import si.feri.itk.projectmanager.dto.common.IDuration;
 import si.feri.itk.projectmanager.interfaces.IProjectBudgetRequest;
@@ -14,15 +13,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
-public class CreateProjectRequest implements IProjectBudgetRequest, IDuration {
+public class UpdateProjectRequest implements IDuration, IProjectBudgetRequest {
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
 
     private UUID projectBudgetSchemaId;
 
-    //budget
     @DecimalMax(value = "99999999.99")
     @DecimalMin(value = "0.00")
     private BigDecimal staffBudget;

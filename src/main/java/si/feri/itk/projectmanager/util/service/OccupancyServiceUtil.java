@@ -5,6 +5,7 @@ import si.feri.itk.projectmanager.dto.request.UpdateOccupancyRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.model.Occupancy;
+import si.feri.itk.projectmanager.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +23,8 @@ public class OccupancyServiceUtil {
         if (request.getFromMonth() == null) {
             throw new BadRequestException("From month is required.");
         }
+
+        DateUtil.validateDurationStrict(request);
 
         if (request.getPersonId() == null) {
             throw new BadRequestException("Person id is required.");
