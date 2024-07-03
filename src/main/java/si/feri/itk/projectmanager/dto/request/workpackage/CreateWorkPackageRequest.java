@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.request.workpackage;
 
 import jakarta.validation.constraints.Min;
 import lombok.Getter;

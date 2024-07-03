@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import si.feri.itk.projectmanager.dto.request.CreateWorkPackageRequest;
+import si.feri.itk.projectmanager.dto.request.workpackage.CreateWorkPackageRequest;
 import si.feri.itk.projectmanager.exceptions.CustomRuntimeException;
 import si.feri.itk.projectmanager.model.WorkPackage;
 

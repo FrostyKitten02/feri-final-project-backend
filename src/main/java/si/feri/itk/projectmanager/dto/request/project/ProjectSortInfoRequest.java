@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.sortinforequest;
+package si.feri.itk.projectmanager.dto.request.project;
 
 import si.feri.itk.projectmanager.paging.request.SortInfoRequest;
 import si.feri.itk.projectmanager.paging.ProjectSortInfo;

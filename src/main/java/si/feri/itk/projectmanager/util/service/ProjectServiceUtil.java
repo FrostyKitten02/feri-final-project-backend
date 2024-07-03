@@ -1,8 +1,8 @@
 package si.feri.itk.projectmanager.util.service;
 
-import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
-import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
-import si.feri.itk.projectmanager.dto.response.project.UpdateProjectRequest;
+import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
+import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
+import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.interfaces.IProjectBudgetRequest;
 import si.feri.itk.projectmanager.model.Project;

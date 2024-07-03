@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.request.occupancy;
 
 
 import jakarta.validation.constraints.DecimalMax;

@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import si.feri.itk.projectmanager.TestUtil;
-import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
+import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;

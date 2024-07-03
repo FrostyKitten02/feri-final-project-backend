@@ -1,8 +1,8 @@
 package si.feri.itk.projectmanager.util.service;
 
 import si.feri.itk.projectmanager.dto.common.IDuration;
-import si.feri.itk.projectmanager.dto.request.CreateWorkPackageRequest;
-import si.feri.itk.projectmanager.dto.request.UpdateWorkPackageRequest;
+import si.feri.itk.projectmanager.dto.request.workpackage.CreateWorkPackageRequest;
+import si.feri.itk.projectmanager.dto.request.workpackage.UpdateWorkPackageRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.model.Project;
