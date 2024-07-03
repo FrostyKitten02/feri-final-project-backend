@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import si.feri.itk.projectmanager.dto.request.AddPersonToTaskRequest;
-import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
-import si.feri.itk.projectmanager.dto.request.UpdateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.AddPersonToTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.CreateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.UpdateTaskRequest;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.service.TaskService;
 

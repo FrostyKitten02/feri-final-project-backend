@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.request.project;
 
 import lombok.Getter;
 import lombok.Setter;

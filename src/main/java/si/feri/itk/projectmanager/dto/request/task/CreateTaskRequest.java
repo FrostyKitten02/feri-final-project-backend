@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.request.task;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

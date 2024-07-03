@@ -1,7 +1,7 @@
 package si.feri.itk.projectmanager.util.service;
 
-import si.feri.itk.projectmanager.dto.request.CreateOccupancyRequest;
-import si.feri.itk.projectmanager.dto.request.UpdateOccupancyRequest;
+import si.feri.itk.projectmanager.dto.request.occupancy.CreateOccupancyRequest;
+import si.feri.itk.projectmanager.dto.request.occupancy.UpdateOccupancyRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.model.Occupancy;

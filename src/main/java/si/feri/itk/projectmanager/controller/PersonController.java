@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.model.PersonDto;
 import si.feri.itk.projectmanager.dto.model.SalaryDto;
-import si.feri.itk.projectmanager.dto.response.GetPersonResponse;
+import si.feri.itk.projectmanager.dto.response.person.GetPersonResponse;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.SalaryService;
 

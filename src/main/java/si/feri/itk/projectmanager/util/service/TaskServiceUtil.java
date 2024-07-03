@@ -1,8 +1,8 @@
 package si.feri.itk.projectmanager.util.service;
 
-import si.feri.itk.projectmanager.dto.request.AddPersonToTaskRequest;
-import si.feri.itk.projectmanager.dto.request.CreateTaskRequest;
-import si.feri.itk.projectmanager.dto.request.UpdateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.AddPersonToTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.CreateTaskRequest;
+import si.feri.itk.projectmanager.dto.request.task.UpdateTaskRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.model.PersonOnTask;
@@ -13,7 +13,6 @@ import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.UUID;
 
 public class TaskServiceUtil {

@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.request;
+package si.feri.itk.projectmanager.dto.request.workpackage;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
