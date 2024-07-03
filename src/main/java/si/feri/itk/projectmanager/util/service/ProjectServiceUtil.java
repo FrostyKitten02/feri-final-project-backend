@@ -3,9 +3,7 @@ package si.feri.itk.projectmanager.util.service;
 import si.feri.itk.projectmanager.dto.request.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.response.project.UpdateProjectRequest;
-import si.feri.itk.projectmanager.dto.response.project.UpdateProjectResponse;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
-import si.feri.itk.projectmanager.interfaces.IProjectBudget;
 import si.feri.itk.projectmanager.interfaces.IProjectBudgetRequest;
 import si.feri.itk.projectmanager.model.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
@@ -16,7 +14,6 @@ import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -138,6 +135,11 @@ public class ProjectServiceUtil {
 
     private static void updateProjectBudget(IProjectBudgetRequest request, Project project, ProjectBudgetSchema schema) {
         boolean isBudgetChanged = false;
+        if (request.getProjectBudgetSchemaId() != null) {
+            project.setProjectBudgetSchemaId(request.getProjectBudgetSchemaId());
+            isBudgetChanged = true;
+        }
+
         if (request.getStaffBudget() != null) {
             project.setStaffBudget(request.getStaffBudget());
             isBudgetChanged = true;
