@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import si.feri.itk.projectmanager.dto.model.PersonDto;
+import si.feri.itk.projectmanager.dto.model.person.PersonDtoImpl;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
@@ -81,7 +81,7 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/people")
     public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
-        List<PersonDto> people = personService.findPeopleOnProject(projectId, servletRequest);
+        List<PersonDtoImpl> people = personService.findPeopleOnProject(projectId, servletRequest);
         GetPeopleResponse response = new GetPeopleResponse();
         response.setPeople(people);
         response.setProjectId(projectId);
