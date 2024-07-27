@@ -39,6 +39,17 @@ public class WorkPackageService {
         return workPackageRepo.save(workPackage).getId();
     }
 
+    public void deleteWorkPackage(UUID workPackageId, HttpServletRequest request) {
+        if (workPackageId == null) {
+            throw new ItemNotFoundException("Work package not found");
+        }
+
+        final String userId = RequestUtil.getUserIdStrict(request);
+        projectRepo.findProjectByWorkPackageIdAndOwnerId(workPackageId, userId).orElseThrow(()->new ItemNotFoundException("Work package not found"));
+        final WorkPackage workPackage = workPackageRepo.findById(workPackageId).orElseThrow(()->new ItemNotFoundException("Work package not found"));
+        workPackageRepo.delete(workPackage);
+    }
+
     public void updateWorkPackage(UUID workPackageId, UpdateWorkPackageRequest request, HttpServletRequest servletRequest) {
         final String userId = RequestUtil.getUserIdStrict(servletRequest);
         final Project project = projectRepo.findProjectByWorkPackageIdAndOwnerId(workPackageId, userId).orElseThrow(()->new ItemNotFoundException("Work package not found"));
@@ -55,7 +66,5 @@ public class WorkPackageService {
         LocalDate end = taskRepo.findLatestDateByWorkPackageId(workPackageId).orElse(null);
         return new Duration(start, end);
     }
-
-
 
 }

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +66,11 @@ public class ProjectController {
         GetProjectResponse response = new GetProjectResponse();
         response.setProjectDto(project);
         return response;
+    }
+
+    @DeleteMapping("/{projectId}")
+    public void deleteProject(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
+        projectService.deleteProject(projectId, servletRequest);
     }
 
     @PostMapping("{projectId}/add-person-to-project/")

@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,6 +24,10 @@ public class WorkPackage extends BaseModel {
     //person months for this work package
     @Column(name = "assigned_PM")
     private Long assignedPM;
-    @OneToMany(mappedBy = "workPackageId", fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "workPackageId",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.REMOVE
+    )
     private List<Task> tasks;
 }

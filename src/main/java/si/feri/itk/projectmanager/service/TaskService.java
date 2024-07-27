@@ -44,6 +44,14 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    public void deleteTask(UUID taskId, HttpServletRequest servletRequest) {
+        final String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findProjectByTaskIdAndOwnerId(taskId, userId).orElseThrow(() -> new BadRequestException("Invalid task id"));
+
+        Task task = taskRepo.findById(taskId).orElseThrow(() -> new ItemNotFoundException("Task not found"));
+        taskRepo.delete(task);
+    }
+
     public UUID createTask(CreateTaskRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
 
