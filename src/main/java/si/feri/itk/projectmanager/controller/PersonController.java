@@ -44,12 +44,6 @@ public class PersonController {
         return response;
     }
 
-    //FIXME: This is temporary endpoint, we will implement pagination later
-    @GetMapping("/all")
-    public List<PersonDtoImpl> getAllPeople() {
-        return personService.getAllPeople();
-    }
-
     @GetMapping("/list")
     public ListPersonResponse listPeople(
             @NotNull PageInfoRequest pageInfo,

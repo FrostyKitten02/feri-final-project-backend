@@ -42,10 +42,6 @@ public class PersonService {
         return people.stream().map(PersonMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
-    public List<PersonDtoImpl> getAllPeople() {
-        return personRepo.findAll().stream().map(PersonMapper.INSTANCE::toDto).collect(Collectors.toList());
-    }
-
     public ListPersonResponse searchPeople(PageInfoRequest pageInfoRequest, PersonSortInfoRequest sortInfoRequest, PersonListSearchParams searchParams) {
         SortInfo<?> sort = RequestUtil.getSortInfoFromRequest(sortInfoRequest);
         Page<PersonList> peoplePage = personListRepo.searchPeople(searchParams, PageInfo.toPageRequest(pageInfoRequest, sort));
