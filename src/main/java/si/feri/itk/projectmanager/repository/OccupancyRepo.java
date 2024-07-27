@@ -43,4 +43,9 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
             "FROM Occupancy o " +
             "WHERE o.projectId = :projectId ")
     Optional<LocalDate> findLatestMonthByProjectId(UUID projectId);
+
+    @Modifying
+    @Query("DELETE FROM Occupancy o " +
+            "WHERE o.projectId = :projectId ")
+    void deleteAllByProjectId(UUID projectId);
 }

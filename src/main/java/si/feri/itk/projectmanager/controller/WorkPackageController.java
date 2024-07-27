@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,11 @@ public class WorkPackageController {
         ResourceCreatedResponse response = new ResourceCreatedResponse();
         response.setId(workPackageId);
         return response;
+    }
+
+    @DeleteMapping("/{workPackageId}")
+    public void deleteWorkPackage(@PathVariable UUID workPackageId, HttpServletRequest servletRequest) {
+        workPackageService.deleteWorkPackage(workPackageId, servletRequest);
     }
 
     @PatchMapping("/{workPackageId}")

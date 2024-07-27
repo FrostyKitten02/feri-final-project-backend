@@ -2,6 +2,7 @@ package si.feri.itk.projectmanager.service;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -73,6 +74,19 @@ public class ProjectService {
 
         Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
         return projectRepo.save(project).getId();
+    }
+
+    @Transactional
+    public void deleteProject(UUID projectId, HttpServletRequest req) {
+        if (projectId == null) {
+            throw new BadRequestException("Project id is required");
+        }
+
+        final String userId = RequestUtil.getUserIdStrict(req);
+        final Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+        personOnProjectRepo.deleteAllByProjectId(projectId);
+        occupancyRepo.deleteAllByProjectId(projectId);
+        projectRepo.delete(project);
     }
 
     public ProjectDto updateProject(UUID projectId, UpdateProjectRequest request, HttpServletRequest servletRequest) {
@@ -189,7 +203,6 @@ public class ProjectService {
 
         return response;
     }
-
 
     private void calculateProjectSalaryStats(ProjectStatisticsResponse response, List<Person> people, UUID projectId) {
         for (ProjectMonthDto month : response.getMonths()) {
