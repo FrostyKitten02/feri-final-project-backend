@@ -5,15 +5,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import si.feri.itk.projectmanager.dto.model.SalaryDto;
-import si.feri.itk.projectmanager.dto.request.CreateSalaryRequest;
+import si.feri.itk.projectmanager.dto.model.salary.SalaryDto;
+import si.feri.itk.projectmanager.dto.request.salary.CreateSalaryRequest;
+import si.feri.itk.projectmanager.dto.request.salary.SalaryListSearchParams;
+import si.feri.itk.projectmanager.dto.request.salary.SalaryListSortInfoRequest;
+import si.feri.itk.projectmanager.dto.response.salary.ListSalaryResponse;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.exceptions.implementation.UnauthorizedException;
 import si.feri.itk.projectmanager.mapper.SalaryMapper;
 import si.feri.itk.projectmanager.model.person.Salary;
+import si.feri.itk.projectmanager.model.person.SalaryList;
+import si.feri.itk.projectmanager.paging.PageInfo;
+import si.feri.itk.projectmanager.paging.SortInfo;
+import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
+import si.feri.itk.projectmanager.repository.salarylist.SalaryListRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.service.SalaryServiceUtil;
 
@@ -25,6 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SalaryService {
     private final SalaryRepo salaryRepo;
+    private final SalaryListRepo salaryListRepo;
 
     @Value("${admin-clerk-id}")
     private String adminId;
@@ -81,4 +91,11 @@ public class SalaryService {
 
         salaryRepo.save(conflictiongSalary);
     }
+
+    public ListSalaryResponse searchSalaries(PageInfoRequest pageInfoRequest, SalaryListSortInfoRequest sortInfoRequest, SalaryListSearchParams searchParams) {
+        SortInfo<?> sort = RequestUtil.getSortInfoFromRequest(sortInfoRequest);
+        Page<SalaryList> salariesPage = salaryListRepo.searchSalaries(searchParams, PageInfo.toPageRequest(pageInfoRequest, sort));
+        return ListSalaryResponse.fromPage(salariesPage);
+    }
+
 }

@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import si.feri.itk.projectmanager.dto.model.person.PersonDtoImpl;
+import si.feri.itk.projectmanager.dto.model.person.PersonDto;
 import si.feri.itk.projectmanager.dto.request.person.PersonListSearchParams;
 import si.feri.itk.projectmanager.dto.request.person.PersonSortInfoRequest;
 import si.feri.itk.projectmanager.dto.response.person.ListPersonResponse;
@@ -13,7 +13,6 @@ import si.feri.itk.projectmanager.mapper.PersonMapper;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonList;
 import si.feri.itk.projectmanager.paging.PageInfo;
-import si.feri.itk.projectmanager.paging.PersonSortInfo;
 import si.feri.itk.projectmanager.paging.SortInfo;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.repository.PersonRepo;
@@ -31,11 +30,11 @@ public class PersonService {
     private final PersonRepo personRepo;
     private final ProjectRepo projectRepo;
     private final PersonListRepo personListRepo;
-    public PersonDtoImpl getPersonById(UUID personId) {
+    public PersonDto getPersonById(UUID personId) {
         return personRepo.findById(personId).map(PersonMapper.INSTANCE::toDto).orElseThrow(() -> new ItemNotFoundException("Person not found"));
     }
 
-    public List<PersonDtoImpl> findPeopleOnProject(UUID projectId, HttpServletRequest servletRequest) {
+    public List<PersonDto> findPeopleOnProject(UUID projectId, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
         List<Person> people = personRepo.findAllByProjectId(projectId);

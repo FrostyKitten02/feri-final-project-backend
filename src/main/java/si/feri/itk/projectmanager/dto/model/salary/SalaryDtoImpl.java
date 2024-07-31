@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.dto.model;
+package si.feri.itk.projectmanager.dto.model.salary;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SalaryDto {
+public class SalaryDtoImpl implements SalaryDto, SalaryListDto {
     private UUID personId;
     private BigDecimal amount;
     private LocalDate startDate;
