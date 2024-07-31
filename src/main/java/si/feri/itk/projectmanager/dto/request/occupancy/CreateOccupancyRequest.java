@@ -1,6 +1,7 @@
 package si.feri.itk.projectmanager.dto.request.occupancy;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
@@ -24,10 +25,12 @@ public class CreateOccupancyRequest implements IDuration {
     @DecimalMin(value = "0.001")
     private BigDecimal value;
 
+     @JsonIgnore
     public LocalDate getStartDate() {
         return fromMonth;
     }
 
+    @JsonIgnore
     public LocalDate getEndDate() {
         return toMonth;
     }
