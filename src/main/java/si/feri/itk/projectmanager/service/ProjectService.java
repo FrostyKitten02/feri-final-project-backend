@@ -148,6 +148,17 @@ public class ProjectService {
         personOnProjectRepo.save(personOnProject);
     }
 
+    @Transactional
+    public void removePersonFromProject(UUID projectId, UUID personId, HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        ProjectServiceUtil.validateRemovePersonFromProject(projectId, personId);
+        projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+        personRepo.findById(personId).orElseThrow(() -> new ItemNotFoundException("Person not found"));
+
+        occupancyRepo.deleteAllByPersonIdAndProjectId(personId, projectId);
+        personOnProjectRepo.deleteAllByPersonIdAndProjectId(personId, projectId);
+    }
+
     private PersonOnProject createPersonOnProject(UUID projectId, String ownerId, UUID personId) {
         Project project = projectRepo.findByIdAndOwnerId(projectId, ownerId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
         Person person = personRepo.findById(personId).orElseThrow(() -> new ItemNotFoundException("Person not found"));

@@ -79,6 +79,12 @@ public class ProjectController {
         servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
+    @DeleteMapping("{projectId}/remove-person/{personId}")
+    public void removePersonFromProject(@PathVariable UUID projectId, @PathVariable UUID personId, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+        projectService.removePersonFromProject(projectId, personId, servletRequest);
+        servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
     @GetMapping("/{projectId}/people")
     public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
         List<PersonDtoImpl> people = personService.findPeopleOnProject(projectId, servletRequest);
