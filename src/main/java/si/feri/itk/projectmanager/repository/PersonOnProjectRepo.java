@@ -18,4 +18,11 @@ public interface PersonOnProjectRepo extends JpaRepository<PersonOnProject, UUID
     @Query("DELETE FROM PersonOnProject p " +
             "WHERE p.projectId = :projectId ")
     void deleteAllByProjectId(UUID projectId);
+
+    //this should only delete one row
+    @Modifying
+    @Query("DELETE FROM PersonOnProject p " +
+            "WHERE p.personId = :personId " +
+            "AND p.projectId = :projectId ")
+    void deleteAllByPersonIdAndProjectId(UUID personId, UUID projectId);
 }

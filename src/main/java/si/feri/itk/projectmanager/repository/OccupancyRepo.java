@@ -48,4 +48,10 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
     @Query("DELETE FROM Occupancy o " +
             "WHERE o.projectId = :projectId ")
     void deleteAllByProjectId(UUID projectId);
+
+    @Modifying
+    @Query("DELETE FROM Occupancy o " +
+            "WHERE o.personId = :personId " +
+            "AND o.projectId = :projectId ")
+    void deleteAllByPersonIdAndProjectId(UUID personId, UUID projectId);
 }

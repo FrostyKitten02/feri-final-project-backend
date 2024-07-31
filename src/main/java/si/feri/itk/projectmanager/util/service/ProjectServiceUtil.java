@@ -175,6 +175,16 @@ public class ProjectServiceUtil {
         }
     }
 
+    public static void validateRemovePersonFromProject(UUID projectId, UUID personId) {
+        if (projectId == null) {
+            throw new BadRequestException("Project id is required");
+        }
+
+        if (personId == null) {
+            throw new BadRequestException("Person id is required");
+        }
+    }
+
     public static PersonOnProject createNewPersonOnProject(Project project, Person person) {
         PersonOnProject personOnProject = new PersonOnProject();
         personOnProject.setPersonId(person.getId());
