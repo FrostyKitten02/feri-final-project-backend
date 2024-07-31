@@ -9,20 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import si.feri.itk.projectmanager.dto.model.person.PersonDtoImpl;
-import si.feri.itk.projectmanager.dto.model.SalaryDto;
+import si.feri.itk.projectmanager.dto.model.person.PersonDto;
+import si.feri.itk.projectmanager.dto.model.salary.SalaryDto;
 import si.feri.itk.projectmanager.dto.request.person.PersonListSearchParams;
 import si.feri.itk.projectmanager.dto.request.person.PersonSortInfoRequest;
-import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
-import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.dto.response.person.GetPersonResponse;
 import si.feri.itk.projectmanager.dto.response.person.ListPersonResponse;
-import si.feri.itk.projectmanager.paging.PersonSortInfo;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.SalaryService;
 
-import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin
@@ -35,7 +31,7 @@ public class PersonController {
 
     @GetMapping("/{personId}")
     public GetPersonResponse getPersonById(@PathVariable UUID personId, HttpServletRequest servletRequest) {
-        PersonDtoImpl person = personService.getPersonById(personId);
+        PersonDto person = personService.getPersonById(personId);
         SalaryDto salary = salaryService.getPersonCurrentSalary(personId);
 
         GetPersonResponse response = new GetPersonResponse();

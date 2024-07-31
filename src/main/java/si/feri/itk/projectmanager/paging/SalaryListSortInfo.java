@@ -10,22 +10,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class PersonSortInfo extends SortInfo<PersonSortInfo.Field> {
+public class SalaryListSortInfo extends SortInfo<SalaryListSortInfo.Field>{
     @Getter
     @JsonIgnore
-    private static final Map<String, PersonSortInfo.Field> fieldMap = new HashMap<>();
+    private static final Map<String, SalaryListSortInfo.Field> fieldMap = new HashMap<>();
 
     static {
-        Arrays.stream(PersonSortInfo.Field.values()).sorted().forEach(field -> {
+        Arrays.stream(SalaryListSortInfo.Field.values()).sorted().forEach(field -> {
             fieldMap.put(field.getColumnName(), field);
         });
     }
 
-    public PersonSortInfo(List<Field> fields, boolean ascending) {
-        super(ascending, fields, Field.NAME);
+
+    public SalaryListSortInfo(List<SalaryListSortInfo.Field> fields, boolean ascending) {
+        super(ascending, fields, SalaryListSortInfo.Field.START_DATE);
     }
 
-    public static PersonSortInfo fromPage(Page<?> page) {
+
+    public static SalaryListSortInfo fromPage(Page<?> page) {
         boolean ascending = true;
         if (!page.getSort().toList().isEmpty()) {
             ascending = page.getSort().toList().getFirst().getDirection().isAscending();
@@ -33,23 +35,23 @@ public class PersonSortInfo extends SortInfo<PersonSortInfo.Field> {
             return null;
         }
 
-        List<PersonSortInfo.Field> sortFields = page.getSort().get().map(order -> {
+        List<SalaryListSortInfo.Field> sortFields = page.getSort().get().map(order -> {
             return fieldMap.get(order.getProperty());
         }).filter(Objects::nonNull).toList();
 
 
         if (sortFields.isEmpty()) {
-            return new PersonSortInfo(null, ascending);
+            return new SalaryListSortInfo(null, ascending);
         }
 
-        return new PersonSortInfo(sortFields, ascending);
+        return new SalaryListSortInfo(sortFields, ascending);
     }
 
 
     public enum Field implements IField {
-        NAME("name"),
-        LASTNAME("lastname"),
-        EMAIL("email");
+        START_DATE("startDate"),
+        END_DATE("endDate"),
+        AMOUNT("amount");
         @Getter
         private final String columnName;
         Field(String columnName) {

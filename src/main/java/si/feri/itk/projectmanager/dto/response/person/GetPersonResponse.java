@@ -2,12 +2,12 @@ package si.feri.itk.projectmanager.dto.response.person;
 
 import lombok.Getter;
 import lombok.Setter;
-import si.feri.itk.projectmanager.dto.model.person.PersonDtoImpl;
-import si.feri.itk.projectmanager.dto.model.SalaryDto;
+import si.feri.itk.projectmanager.dto.model.person.PersonDto;
+import si.feri.itk.projectmanager.dto.model.salary.SalaryDto;
 
 @Getter
 @Setter
 public class GetPersonResponse {
-    private PersonDtoImpl person;
+    private PersonDto person;
     private SalaryDto currentSalary;
 }

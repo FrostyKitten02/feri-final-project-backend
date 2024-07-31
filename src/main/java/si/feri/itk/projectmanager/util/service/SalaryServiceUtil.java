@@ -1,6 +1,6 @@
 package si.feri.itk.projectmanager.util.service;
 
-import si.feri.itk.projectmanager.dto.request.CreateSalaryRequest;
+import si.feri.itk.projectmanager.dto.request.salary.CreateSalaryRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.model.person.Salary;
 import si.feri.itk.projectmanager.util.DateUtil;
