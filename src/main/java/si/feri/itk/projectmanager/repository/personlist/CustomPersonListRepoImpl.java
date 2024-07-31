@@ -10,6 +10,7 @@ import si.feri.itk.projectmanager.model.QProjectList;
 import si.feri.itk.projectmanager.model.person.PersonList;
 import si.feri.itk.projectmanager.model.person.QPersonList;
 import si.feri.itk.projectmanager.repository.QuerydslParent;
+import si.feri.itk.projectmanager.util.StringUtil;
 
 public class CustomPersonListRepoImpl extends QuerydslParent implements CustomPersonListRepo {
     public CustomPersonListRepoImpl() {
@@ -21,7 +22,7 @@ public class CustomPersonListRepoImpl extends QuerydslParent implements CustomPe
         QPersonList qPersonList = QPersonList.personList;
         BooleanBuilder restrictions = new BooleanBuilder();
 
-        if (searchParams != null && searchParams.getSearchStr() != null) {
+        if (searchParams != null && !StringUtil.isNullOrEmpty(searchParams.getSearchStr())) {
             BooleanBuilder searchStringRestrictions = createSearchStringRestrictions(searchParams.getSearchStr(), qPersonList);
             restrictions.and(searchStringRestrictions);
         }
@@ -39,6 +40,7 @@ public class CustomPersonListRepoImpl extends QuerydslParent implements CustomPe
         for (String ss : searchString.split(" ")) {
             searchStringRestrictions.or(qPersonList.name.containsIgnoreCase(ss));
             searchStringRestrictions.or(qPersonList.lastname.containsIgnoreCase(ss));
+            searchStringRestrictions.or(qPersonList.email.containsIgnoreCase(ss));
         }
         return searchStringRestrictions;
     }
