@@ -22,6 +22,7 @@ import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsRespo
 import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
+import si.feri.itk.projectmanager.mapper.PersonMapper;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
 import si.feri.itk.projectmanager.model.Occupancy;
 import si.feri.itk.projectmanager.model.Project;
@@ -209,7 +210,7 @@ public class ProjectService {
             ArrayList<PersonWorkDto> personWorkDtos = new ArrayList<>(people.size());
             for (Person p : people) {
                 PersonWorkDto personWorkDto = new PersonWorkDto();
-                personWorkDto.setPersonId(p.getId());
+                personWorkDto.setPerson(PersonMapper.INSTANCE.toDto(p));
                 Optional<Occupancy> occupancyOpt = occupancyRepo.findByMonthAndPersonIdAndProjectId(month.getDate(), p.getId(), projectId);
                 if (occupancyOpt.isPresent()) {
                     Occupancy occupancy = occupancyOpt.get();
