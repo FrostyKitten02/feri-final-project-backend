@@ -21,7 +21,7 @@ public class ListPersonResponse {
 
 
     public static ListPersonResponse fromPage(Page<PersonList> page) {
-        List<PersonListDto> projects = page.getContent().stream().map(pl -> (PersonListDto) PersonMapper.INSTANCE.toDto(pl)).toList();
+        List<PersonListDto> projects = page.getContent().stream().map(PersonMapper.INSTANCE::toDto).toList();
         PageInfo pageInfoRes = PageInfo.from(page);
 
         PersonSortInfo projectSortInfo = PersonSortInfo.fromPage(page);
