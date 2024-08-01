@@ -8,8 +8,4 @@ import java.util.UUID;
 
 @Repository
 public interface PersonListRepo extends JpaRepository<PersonList, UUID>, CustomPersonListRepo {
-
-
-
-
 }
