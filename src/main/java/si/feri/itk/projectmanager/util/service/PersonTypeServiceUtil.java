@@ -1,6 +1,6 @@
 package si.feri.itk.projectmanager.util.service;
 
-import si.feri.itk.projectmanager.dto.request.CreatePersonTypeRequest;
+import si.feri.itk.projectmanager.dto.request.persontype.CreatePersonTypeRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.model.person.PersonType;
 import si.feri.itk.projectmanager.util.DateUtil;
@@ -8,7 +8,6 @@ import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
 
 public class PersonTypeServiceUtil {
     private PersonTypeServiceUtil() {}

@@ -49,7 +49,7 @@ public class CustomSalaryListRepoImpl extends QuerydslParent implements CustomSa
     }
 
 
-    public static BooleanBuilder createSalariesDatesRestriction(SalaryListSearchParams searchParams, QSalaryList qSalaryList) {
+    public BooleanBuilder createSalariesDatesRestriction(SalaryListSearchParams searchParams, QSalaryList qSalaryList) {
         BooleanBuilder salaryDatesRestriction = new BooleanBuilder();
 
         LocalDate startFrom = searchParams.getStartDateFrom();
