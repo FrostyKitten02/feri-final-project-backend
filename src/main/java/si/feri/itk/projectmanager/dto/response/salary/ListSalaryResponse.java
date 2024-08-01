@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 import si.feri.itk.projectmanager.dto.model.salary.SalaryDto;
+import si.feri.itk.projectmanager.dto.model.salary.SalaryListDto;
 import si.feri.itk.projectmanager.mapper.SalaryMapper;
 import si.feri.itk.projectmanager.model.person.SalaryList;
 import si.feri.itk.projectmanager.paging.PageInfo;
@@ -15,12 +16,12 @@ import java.util.List;
 @Getter
 @Setter
 public class ListSalaryResponse {
-    private List<SalaryDto> salaries;
+    private List<SalaryListDto> salaries;
     private PageInfo pageInfo;
     private SortInfoResponse<?> sortInfo;
 
     public static ListSalaryResponse fromPage(Page<SalaryList> page) {
-        List<SalaryDto> salaries = page.getContent().stream().map(s -> (SalaryDto)SalaryMapper.INSTANCE.toDto(s)).toList();
+        List<SalaryListDto> salaries = page.getContent().stream().map(SalaryMapper.INSTANCE::toDto).toList();
         PageInfo pageInfoRes = PageInfo.from(page);
 
         ProjectSortInfo projectSortInfo = ProjectSortInfo.fromPage(page);
