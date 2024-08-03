@@ -58,6 +58,7 @@ public class StatisticsUtilTest {
         project.setEndDate(wp.getEndDate());
         project.setStartDate(wp.getStartDate());
         project.setWorkPackages(List.of(wp, wp2));
+        project.setStaffBudget(BigDecimal.valueOf(100000L));
 
         BigDecimal totalPM = BigDecimal.valueOf(wp.getAssignedPM() + wp2.getAssignedPM());
         //we allow 2% error!!
