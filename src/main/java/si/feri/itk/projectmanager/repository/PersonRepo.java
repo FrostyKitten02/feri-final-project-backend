@@ -20,4 +20,5 @@ public interface PersonRepo extends JpaRepository<Person, UUID> {
             "   WHERE pop.projectId = :projectId" +
             "   )")
     List<Person> findAllByProjectId(UUID projectId);
+    List<Person> findAllByClerkIdIn(List<String> personIds);
 }

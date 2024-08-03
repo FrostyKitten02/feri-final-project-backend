@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import si.feri.itk.projectmanager.model.Project;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,4 +37,9 @@ public interface ProjectRepo extends JpaRepository<Project, UUID> {
             "   )" +
             "AND p.ownerId = :ownerId")
     Optional<Project> findProjectByWorkPackageIdAndOwnerId(UUID workPackageId, String ownerId);
+
+    @Query("select p.ownerId, p.title, p.startDate " +
+            "from Project as p " +
+            "where p.id in :projectIds")
+    List<Project> findAllByIdInMinimal(List<UUID> projectIds);
 }
