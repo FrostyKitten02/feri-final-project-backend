@@ -1,5 +1,6 @@
 package si.feri.itk.projectmanager.util;
 
+import lombok.extern.slf4j.Slf4j;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.WorkPackageWithStatisticsDto;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class StatisticUtil {
     private StatisticUtil() {}
     private static final int PM_SCALE = 3;
@@ -34,7 +36,7 @@ public class StatisticUtil {
             final BigDecimal pmBurnDownPerWp = calculateWorkPackagePmBurnDownRate(wp.getAssignedPM(), wpMonths);
             final BigDecimal pmBurnDownRatePerTask = calculateTaskBurnDownRate(wp.getTasks(), wp.getAssignedPM());
 
-            addTasksBurnDownToProjectMonths(wp.getTasks(), projectMonthDtos, pmBurnDownRatePerTask);
+            addWorkPackageBurnDownRateToProjectMonths(wp, projectMonthDtos, pmBurnDownPerWp);
 
             WorkPackageWithStatisticsDto wpWithStats = WorkPackageMapper.INSTANCE.toDtoWithStatistics(wp);
             wpWithStats.setPmBurnDownRate(pmBurnDownPerWp);
@@ -43,11 +45,27 @@ public class StatisticUtil {
             wpWithStatsList.add(wpWithStats);
         }
 
+        setMonthsStaffBudgetBurnDown(projectMonthDtos, project);
 
         ProjectStatisticsResponse projectStatisticsResponse = new ProjectStatisticsResponse();
         projectStatisticsResponse.setWorkPackages(wpWithStatsList);
         projectStatisticsResponse.setMonths(projectMonthDtos);
         return projectStatisticsResponse;
+    }
+
+    private static void setMonthsStaffBudgetBurnDown(List<ProjectMonthDto> projectMonthDtos, Project project) {
+        BigDecimal totalPms = projectMonthDtos.stream().reduce(BigDecimal.ZERO, (acc, month) -> acc.add(month.getPmBurnDownRate()), BigDecimal::add);
+        BigDecimal totalBudget = project.getStaffBudget();
+        if (totalPms.compareTo(BigDecimal.ZERO) <= 0 || totalBudget.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warn("Could not calculate staff budget burn down rates for project with id: {}, totalPms: {}, totalBudget: {}", project.getId(), totalPms.floatValue(), totalBudget.floatValue());
+            return;
+        }
+
+        for (ProjectMonthDto month : projectMonthDtos) {
+            BigDecimal monthBudgetPercentage = month.getPmBurnDownRate().divide(totalPms, RoundingMode.UP);
+            BigDecimal monthBudget = totalBudget.multiply(monthBudgetPercentage);
+            month.setStaffBudgetBurnDownRate(monthBudget);
+        }
     }
 
     public static BigDecimal calculateAvgMonthSalary(List<Salary> salaries, int monthNumber, int yearNumber) {
@@ -74,19 +92,17 @@ public class StatisticUtil {
         return sum.divide(BigDecimal.valueOf(maxDays), RoundingMode.CEILING);
     }
 
-    private static void addTasksBurnDownToProjectMonths(List<Task> tasks, List<ProjectMonthDto> projectMonthDtos, BigDecimal pmBurnDownRatePerTask) {
-        for (Task task : tasks) {
-            int monthIndex = findIndexOfProjectMonthByMonth(task.getStartDate(), projectMonthDtos);
-            if (monthIndex == -1) {
-                //if this happens, we will have some fun times debugging our app :)
-                throw new InternalServerException("Task start date is not in project months range");
-            }
-            int taskMonthsMaxOffset = DateUtil.getMonthsBetweenDates(task.getStartDate(), task.getEndDate());
+    private static void addWorkPackageBurnDownRateToProjectMonths(WorkPackage wp, List<ProjectMonthDto> projectMonthDtos, BigDecimal wpBurnDownRate) {
+        int monthIndex = findIndexOfProjectMonthByMonth(wp.getStartDate(), projectMonthDtos);
+        if (monthIndex == -1) {
+            //if this happens, we will have some fun times debugging our app :)
+            throw new InternalServerException("Task start date is not in project months range");
+        }
+        int wpMonthOffset = DateUtil.getMonthsBetweenDates(wp.getStartDate(), wp.getEndDate());
 
-            for (int i = 0; i < taskMonthsMaxOffset ; i++) {
-                ProjectMonthDto month = projectMonthDtos.get(monthIndex + i);
-                month.addBurnDownRate(pmBurnDownRatePerTask);
-            }
+        for (int i = 0; i < wpMonthOffset ; i++) {
+            ProjectMonthDto month = projectMonthDtos.get(monthIndex + i);
+            month.addBurnDownRate(wpBurnDownRate);
         }
     }
 
