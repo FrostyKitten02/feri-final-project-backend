@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.dto.common.Duration;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
+import si.feri.itk.projectmanager.dto.model.person.PersonDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
@@ -51,8 +52,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -183,7 +186,11 @@ public class ProjectService {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
         ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project);
-        calculateProjectSalaryStats(stats, personRepo.findAllByProjectId(projectId), projectId);
+
+        List<Person> people = personRepo.findAllByProjectId(projectId);
+        Map<UUID, PersonDto> peopleMap = people.stream().collect(Collectors.toMap(Person::getId, PersonMapper.INSTANCE::toDto));
+        stats.setPeople(peopleMap);
+        calculateProjectSalaryStats(stats, people, projectId);
         return stats;
     }
 
@@ -221,7 +228,7 @@ public class ProjectService {
             ArrayList<PersonWorkDto> personWorkDtos = new ArrayList<>(people.size());
             for (Person p : people) {
                 PersonWorkDto personWorkDto = new PersonWorkDto();
-                personWorkDto.setPerson(PersonMapper.INSTANCE.toDto(p));
+                personWorkDto.setPersonId(p.getId());
                 Optional<Occupancy> occupancyOpt = occupancyRepo.findByMonthAndPersonIdAndProjectId(month.getDate(), p.getId(), projectId);
                 if (occupancyOpt.isPresent()) {
                     Occupancy occupancy = occupancyOpt.get();
