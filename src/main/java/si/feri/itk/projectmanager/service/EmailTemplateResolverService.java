@@ -33,7 +33,7 @@ public class EmailTemplateResolverService {
     }
 
     private String resolveTemplate(String templateName) throws IOException {
-        String fullPath = templatesPath + "/" + templateName + ".html";
+        String fullPath = templatesPath + "/" + templateName;
         Resource resource =ctx.getResource(fullPath);
         return new String(Files.readAllBytes(resource.getFile().toPath()));
     }

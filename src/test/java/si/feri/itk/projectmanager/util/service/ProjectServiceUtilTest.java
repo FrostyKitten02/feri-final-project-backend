@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.exceptions.CustomRuntimeException;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
 

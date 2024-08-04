@@ -8,7 +8,7 @@ import si.feri.itk.projectmanager.dto.request.task.CreateTaskRequest;
 import si.feri.itk.projectmanager.dto.request.task.UpdateTaskRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
 import si.feri.itk.projectmanager.repository.ProjectRepo;

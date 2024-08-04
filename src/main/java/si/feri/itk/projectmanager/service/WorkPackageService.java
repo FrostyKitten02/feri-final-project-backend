@@ -9,7 +9,7 @@ import si.feri.itk.projectmanager.dto.common.IDuration;
 import si.feri.itk.projectmanager.dto.request.workpackage.CreateWorkPackageRequest;
 import si.feri.itk.projectmanager.dto.request.workpackage.UpdateWorkPackageRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.WorkPackage;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.TaskRepo;

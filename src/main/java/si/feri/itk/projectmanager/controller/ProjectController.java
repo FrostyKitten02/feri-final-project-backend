@@ -35,6 +35,10 @@ import si.feri.itk.projectmanager.service.ProjectService;
 import java.util.List;
 import java.util.UUID;
 
+
+//TODO when project is added or edited edit project starting soon email queue!!!
+//on edit only if start date is changed, also check if we even need to send new email based on new start date
+
 @CrossOrigin
 @RestController
 @RequestMapping("/project")

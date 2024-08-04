@@ -1,4 +1,4 @@
-package si.feri.itk.projectmanager.model;
+package si.feri.itk.projectmanager.model.project;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

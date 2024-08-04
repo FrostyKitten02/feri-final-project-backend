@@ -15,11 +15,19 @@ public interface ProjectStartingSoonEmailQueueRepo extends JpaRepository<Project
 
     @Query("SELECT p " +
             "FROM ProjectStartingSoonEmailQueue p " +
-            "WHERE p.sendAt >= :date " +
-            "AND p.attempts > :attempts")
-    List<ProjectStartingSoonEmailQueue> findAllBySendAtAfterOrEqualAndAttemptsMoreThan(LocalDate date, int attempts);
+            "WHERE p.sendAt <= :date " +
+            "AND p.attempts < :attempts")
+    List<ProjectStartingSoonEmailQueue> findAllBySendAtBeforeOrEqualAndAttemptsLessThan(LocalDate date, int attempts);
+
+    ProjectStartingSoonEmailQueue findByProjectId(UUID projectId);
 
     @Modifying
-    @Query("DELETE FROM ProjectStartingSoonEmailQueue p WHERE p.sent = true")
+    @Query("DELETE FROM ProjectStartingSoonEmailQueue p " +
+            "WHERE p.projectId = :projectId")
+    void deleteAllByProjectId(UUID projectId);
+
+    @Modifying
+    @Query("DELETE FROM ProjectStartingSoonEmailQueue p " +
+            "WHERE p.sent = true")
     void deleteAllSent();
 }

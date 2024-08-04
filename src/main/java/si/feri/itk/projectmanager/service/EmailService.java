@@ -5,6 +5,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import si.feri.itk.projectmanager.email.ProjectStartingSoonEmailData;
@@ -18,8 +19,12 @@ import java.io.IOException;
 public class EmailService {
     private final JavaMailSender mailSender;
     private final EmailTemplateResolverService emailTemplateResolverService;
-    private final String from = "project.manager.noreplay@gmail.com";
-    private static final String PROJECT_STARTING_SOON_TEMPLATE = "temp";
+
+    @Value("${spring.mail.from}")
+    private String from;
+
+    @Value("${spring.mail.templates.project-starting-soon}")
+    private String projectStartingSoonTemplate;
 
     public void createAndSendProjectStartingSoonEmail(ProjectStartingSoonEmailData data) throws IOException {
         MimeMessage message = createProjectStartingSoonEmail(data);
@@ -29,7 +34,7 @@ public class EmailService {
     private MimeMessage createProjectStartingSoonEmail(ProjectStartingSoonEmailData data) throws IOException {
         String to = data.getOwner().getEmail();
         String subject = "Project starting soon!";
-        String template = emailTemplateResolverService.resolveAndFillTemplate(PROJECT_STARTING_SOON_TEMPLATE, data.getTemplateValues());
+        String template = emailTemplateResolverService.resolveAndFillTemplate(projectStartingSoonTemplate, data.getTemplateValues());
         return createMimeMessage(to, subject, template);
     }
 

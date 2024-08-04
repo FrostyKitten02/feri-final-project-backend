@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.Querydsl;
 import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
-import si.feri.itk.projectmanager.model.ProjectList;
+import si.feri.itk.projectmanager.model.project.ProjectList;
 import si.feri.itk.projectmanager.model.QProjectList;
 import si.feri.itk.projectmanager.model.person.QPerson;
 import si.feri.itk.projectmanager.model.person.QPersonOnProject;

@@ -4,14 +4,19 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import si.feri.itk.projectmanager.configuration.WebAppConfig;
 import si.feri.itk.projectmanager.email.ProjectStartingSoonEmailData;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.ProjectStartingSoonEmailQueue;
 import si.feri.itk.projectmanager.model.person.Person;
+import si.feri.itk.projectmanager.model.project.ProjectMinimal;
 import si.feri.itk.projectmanager.repository.PersonRepo;
-import si.feri.itk.projectmanager.repository.ProjectRepo;
+import si.feri.itk.projectmanager.repository.ProjectMinimalRepo;
 import si.feri.itk.projectmanager.repository.ProjectStartingSoonEmailQueueRepo;
 import si.feri.itk.projectmanager.service.EmailService;
 
@@ -25,11 +30,12 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ProjectStartingSoonSender {
-    private final EmailService emailService;
-    private final ProjectStartingSoonEmailQueueRepo projectStartingSoonEmailQueueRepo;
-    private final ProjectRepo projectRepo;
     private final PersonRepo personRepo;
-    private static int FAIL_ATTEMPTS_LIMIT = 3;
+    private final EmailService emailService;
+    private final WebAppConfig webAppConfig;
+    private final ProjectMinimalRepo projectMinimalRepo;
+    private final ProjectStartingSoonEmailQueueRepo projectStartingSoonEmailQueueRepo;
+    private static final int FAIL_ATTEMPTS_LIMIT = 3;
 
     //every day at 6:00
     @Transactional
@@ -38,19 +44,20 @@ public class ProjectStartingSoonSender {
         StopWatch swTotal = new StopWatch();
         swTotal.start();
         LocalDate today = LocalDate.now();
-        List<ProjectStartingSoonEmailQueue> queue = projectStartingSoonEmailQueueRepo.findAllBySendAtAfterOrEqualAndAttemptsMoreThan(today, FAIL_ATTEMPTS_LIMIT);
-        Map<UUID, Project> projectMap = getProjectMap(queue);
+        List<ProjectStartingSoonEmailQueue> queue = projectStartingSoonEmailQueueRepo.findAllBySendAtBeforeOrEqualAndAttemptsLessThan(today, FAIL_ATTEMPTS_LIMIT);
+        Map<UUID, ProjectMinimal> projectMap = getProjectMap(queue);
         Map<String, Person> ownerMap = getOwnerMap(projectMap.values().stream().toList());
 
         StopWatch emailSending = new StopWatch();
         emailSending.start();
         for (ProjectStartingSoonEmailQueue q : queue) {
-            Project project = projectMap.get(q.getProjectId());
+            ProjectMinimal project = projectMap.get(q.getProjectId());
             Person owner = ownerMap.get(project.getOwnerId());
 
             ProjectStartingSoonEmailData emailData = new ProjectStartingSoonEmailData();
             emailData.setProject(project);
             emailData.setOwner(owner);
+            emailData.setUrl(webAppConfig.getProjectUrl(project.getId()));
 
             try {
                 emailService.createAndSendProjectStartingSoonEmail(emailData);
@@ -84,14 +91,14 @@ public class ProjectStartingSoonSender {
         log.info("ProjectStartingSoonSender finished in: " + swTotal.formatTime());
     }
 
-    private Map<UUID, Project> getProjectMap(List<ProjectStartingSoonEmailQueue> queue) {
+    private Map<UUID, ProjectMinimal> getProjectMap(List<ProjectStartingSoonEmailQueue> queue) {
         List<UUID> projectIds = queue.stream().map(ProjectStartingSoonEmailQueue::getProjectId).toList();
-        List<Project> projects = projectRepo.findAllByIdInMinimal(projectIds);
-        return projects.stream().collect(Collectors.toMap(Project::getId, p -> p));
+        List<ProjectMinimal> projects = projectMinimalRepo.findAllByIdIn(projectIds);
+        return projects.stream().collect(Collectors.toMap(ProjectMinimal::getId, p -> p));
     }
 
 
-    private Map<String, Person> getOwnerMap(List<Project> projects) {
+    private Map<String, Person> getOwnerMap(List<ProjectMinimal> projects) {
         List<String> ownerIds = projects.stream().map(p -> p.getOwnerId()).toList();
         List<Person> owners = personRepo.findAllByClerkIdIn(ownerIds);
         return owners.stream().collect(Collectors.toMap(Person::getClerkId, p -> p));
