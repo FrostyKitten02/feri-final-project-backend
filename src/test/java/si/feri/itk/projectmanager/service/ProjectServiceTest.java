@@ -12,11 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import si.feri.itk.projectmanager.TestUtil;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
+import si.feri.itk.projectmanager.repository.ProjectStartingSoonEmailQueueRepo;
 import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 
@@ -37,6 +38,8 @@ public class ProjectServiceTest {
     private PersonOnProjectRepo personOnProjectRepo;
     @Mock
     private ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
+    @Mock
+    private ProjectStartingSoonEmailQueueRepo projectStartingSoonEmailQueueRepo;
     @InjectMocks
     private ProjectService projectService;
 

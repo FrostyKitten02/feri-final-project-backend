@@ -5,7 +5,7 @@ import si.feri.itk.projectmanager.dto.request.workpackage.CreateWorkPackageReque
 import si.feri.itk.projectmanager.dto.request.workpackage.UpdateWorkPackageRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.WorkPackage;
 import si.feri.itk.projectmanager.util.DateUtil;
 import si.feri.itk.projectmanager.util.StringUtil;

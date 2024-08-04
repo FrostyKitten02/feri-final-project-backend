@@ -26,9 +26,10 @@ import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundExceptio
 import si.feri.itk.projectmanager.mapper.PersonMapper;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
 import si.feri.itk.projectmanager.model.Occupancy;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
-import si.feri.itk.projectmanager.model.ProjectList;
+import si.feri.itk.projectmanager.model.project.ProjectList;
+import si.feri.itk.projectmanager.model.ProjectStartingSoonEmailQueue;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;
 import si.feri.itk.projectmanager.model.person.Salary;
@@ -39,11 +40,13 @@ import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
+import si.feri.itk.projectmanager.repository.ProjectStartingSoonEmailQueueRepo;
 import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
 import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
+import si.feri.itk.projectmanager.util.ProjectStartingSoonUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StatisticUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
@@ -69,6 +72,9 @@ public class ProjectService {
     private final ProjectListRepo projectListRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
     private final ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
+    private final ProjectStartingSoonEmailQueueRepo projectStartingSoonEmailQueueRepo;
+
+    @Transactional
     public UUID createProject(CreateProjectRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         ProjectServiceUtil.validateCreateProjectRequest(request);
@@ -77,7 +83,14 @@ public class ProjectService {
         BigDecimal indirectBudget = ProjectBudgetUtil.calculateIndirectBudget(request, schema);
 
         Project project = ProjectServiceUtil.createNewProject(request, userId, indirectBudget);
-        return projectRepo.save(project).getId();
+        Project savedProject = projectRepo.save(project);
+
+        if (ProjectStartingSoonUtil.shouldCreateOrUpdateProjectStartingSoonEmailQueue(savedProject)) {
+            ProjectStartingSoonEmailQueue email = ProjectStartingSoonUtil.createProjectStartingSoonEmailQueue(savedProject);
+            projectStartingSoonEmailQueueRepo.save(email);
+        }
+
+        return savedProject.getId();
     }
 
     @Transactional
@@ -91,8 +104,10 @@ public class ProjectService {
         personOnProjectRepo.deleteAllByProjectId(projectId);
         occupancyRepo.deleteAllByProjectId(projectId);
         projectRepo.delete(project);
+        projectStartingSoonEmailQueueRepo.deleteAllByProjectId(projectId);
     }
 
+    @Transactional
     public ProjectDto updateProject(UUID projectId, UpdateProjectRequest request, HttpServletRequest servletRequest) {
         ProjectServiceUtil.validateUpdateProjectRequest(request, projectId);
         final String userId = RequestUtil.getUserIdStrict(servletRequest);
@@ -108,8 +123,23 @@ public class ProjectService {
             schema = projectBudgetSchemaRepo.findById(project.getProjectBudgetSchemaId()).orElseThrow(() -> new ItemNotFoundException("Project budget schema not found"));
         }
 
+        LocalDate prevStartDate = project.getStartDate();
         ProjectServiceUtil.updateProject(request, project, schema, wpDuration, occupancyDuration);
         final Project savedProject = projectRepo.save(project);
+
+
+        ProjectStartingSoonEmailQueue currentEmail = projectStartingSoonEmailQueueRepo.findByProjectId(projectId);
+        if (ProjectStartingSoonUtil.shouldCreateOrUpdateProjectStartingSoonEmailQueue(savedProject)) {
+            if (currentEmail != null) {
+                ProjectStartingSoonUtil.updateProjectStartingSoonEmailQueue(currentEmail, savedProject, prevStartDate);
+            } else {
+                currentEmail = ProjectStartingSoonUtil.createProjectStartingSoonEmailQueue(savedProject);
+            }
+            projectStartingSoonEmailQueueRepo.save(currentEmail);
+        } else {
+            projectStartingSoonEmailQueueRepo.deleteAllByProjectId(projectId);
+        }
+
         return ProjectMapper.INSTANCE.toDto(savedProject);
     }
 

@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.data.domain.Page;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.mapper.ProjectMapper;
-import si.feri.itk.projectmanager.model.ProjectList;
+import si.feri.itk.projectmanager.model.project.ProjectList;
 import si.feri.itk.projectmanager.paging.PageInfo;
 import si.feri.itk.projectmanager.paging.ProjectSortInfo;
 import si.feri.itk.projectmanager.paging.response.SortInfoResponse;

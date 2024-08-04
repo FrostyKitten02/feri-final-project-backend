@@ -5,7 +5,7 @@ import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.interfaces.IProjectBudgetRequest;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
 import si.feri.itk.projectmanager.model.person.Person;
 import si.feri.itk.projectmanager.model.person.PersonOnProject;

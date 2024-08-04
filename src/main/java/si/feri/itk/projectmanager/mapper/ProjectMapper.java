@@ -1,11 +1,10 @@
 package si.feri.itk.projectmanager.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
-import si.feri.itk.projectmanager.model.Project;
-import si.feri.itk.projectmanager.model.ProjectList;
+import si.feri.itk.projectmanager.model.project.Project;
+import si.feri.itk.projectmanager.model.project.ProjectList;
 
 @Mapper
 public  interface ProjectMapper {

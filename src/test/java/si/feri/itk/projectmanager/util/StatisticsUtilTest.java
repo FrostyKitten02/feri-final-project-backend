@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
-import si.feri.itk.projectmanager.model.Project;
+import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
 

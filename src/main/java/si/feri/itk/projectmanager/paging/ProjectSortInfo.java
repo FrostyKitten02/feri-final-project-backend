@@ -3,7 +3,6 @@ package si.feri.itk.projectmanager.paging;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-import si.feri.itk.projectmanager.model.Project;
 
 
 import java.util.Arrays;
