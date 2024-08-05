@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-public class UserCreatedEvent extends ClerkEvent implements IClerkEventType {
+public class UserDeletedEvent extends ClerkEvent implements IClerkEventType {
     @Getter(onMethod = @__(@JsonProperty("data")))
     @Setter(onMethod = @__(@JsonProperty("data")))
-    private ClerkUser user;
+    private ClerkUserDeleted user;
 
     @Override
     @JsonIgnore
     public ClerkEventType getExpectedType() {
-        return ClerkEventType.USER_CREATED;
+        return ClerkEventType.USER_DELETED;
     }
 }
