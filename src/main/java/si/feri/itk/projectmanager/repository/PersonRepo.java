@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import si.feri.itk.projectmanager.model.person.Person;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,4 +22,11 @@ public interface PersonRepo extends JpaRepository<Person, UUID> {
             "   )")
     List<Person> findAllByProjectId(UUID projectId);
     List<Person> findAllByClerkIdIn(List<String> personIds);
+    @Query("SELECT p " +
+            "FROM Person AS p " +
+            "WHERE p.email = :email " +
+            "AND p.clerkId IS NULL")
+    List<Person> findAllByEmailAndClerkIdIsNull(String email);
+
+    Optional<Person> findByClerkId(String clerkId);
 }

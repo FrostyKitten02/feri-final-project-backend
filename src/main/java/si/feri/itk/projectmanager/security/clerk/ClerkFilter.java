@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jose4j.base64url.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
@@ -34,14 +35,20 @@ import java.util.Map;
 public class ClerkFilter extends OncePerRequestFilter {
     private final String clerkPublicKey;
     private final RequestMatcher[] requestMatchers = new RequestMatcher[3];
-
+    private final String clerkKey;
+    private final RequestMatcher clerkControllerMatcher;
     public ClerkFilter(
                 @Value("${clerk.public-jwt-key}") String clerkPublicKey,
                 @Value("${springdoc.api-docs.path}") String swaggerDocs,
                 @Value("${swagger.ui-url}") String swaggerUi,
-                @Value("${springdoc.api-docs.yaml-path}") String swaggerYaml
+                @Value("${springdoc.api-docs.yaml-path}") String swaggerYaml,
+                @Value("${api.key.clerk}") String clerkKey
     ) {
         this.clerkPublicKey = clerkPublicKey;
+        this.clerkKey = clerkKey;
+        //TODO also use IpAddressFilterToCheckClerkIp
+        //list of ips on https://docs.svix.com/webhook-ips.json
+        clerkControllerMatcher = new AntPathRequestMatcher("/clerk/webhook/**");
         requestMatchers[0] = new AntPathRequestMatcher(swaggerDocs + "/**", HttpMethod.GET.name());
         requestMatchers[1] = new AntPathRequestMatcher(swaggerUi + "/**", HttpMethod.GET.name());
         requestMatchers[2] = new AntPathRequestMatcher(swaggerYaml + "/**", HttpMethod.GET.name());
@@ -49,6 +56,18 @@ public class ClerkFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        //TODO: we should make another filter to authenticate api-s, but currently this is good!
+        if (clerkControllerMatcher.matches(request)) {
+            String key = request.getHeader(SecurityConstants.API_KEY_HEADER);
+            if (StringUtil.isNullOrEmpty(key) || !key.equals(clerkKey)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                throw new UnauthorizedException("UNAUTHORIZED API!");
+            }
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         Cookie[] cookies = request.getCookies();
         String session = null;
         if (cookies != null) {
