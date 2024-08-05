@@ -35,7 +35,6 @@ import java.util.Map;
 public class ClerkFilter extends OncePerRequestFilter {
     private final String clerkPublicKey;
     private final RequestMatcher[] requestMatchers = new RequestMatcher[3];
-    private final String clerkUserCreatedPath = "/clerk/user-created";
     private final String clerkKey;
     private final RequestMatcher clerkControllerMatcher;
     public ClerkFilter(
