@@ -134,8 +134,12 @@ public class ProjectServiceUtilTest {
         Project project = new Project();
         project.setId(UUID.randomUUID());
         Person person = new Person();
-        PersonOnProject personOnProject = ProjectServiceUtil.createNewPersonOnProject(project, person);
+        LocalDate date = LocalDate.now();
+        PersonOnProject personOnProject = ProjectServiceUtil.createNewPersonOnProject(project, person, date, date, BigDecimal.ONE);
         Assertions.assertEquals(project.getId(), personOnProject.getProjectId());
         Assertions.assertEquals(person.getId(), personOnProject.getPersonId());
+        Assertions.assertEquals(BigDecimal.ONE, personOnProject.getEstimatedPm());
+        Assertions.assertEquals(date, personOnProject.getFrom());
+        Assertions.assertEquals(date, personOnProject.getTo());
     }
 }
