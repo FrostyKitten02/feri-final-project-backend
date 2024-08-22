@@ -3,6 +3,7 @@ package si.feri.itk.projectmanager.controller;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -78,7 +79,7 @@ public class ProjectController {
     }
 
     @PostMapping("{projectId}/add-person-to-project/")
-    public void addPersonToProject(@PathVariable UUID projectId, @RequestBody AddPersonToProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+    public void addPersonToProject(@PathVariable UUID projectId, @RequestBody @Valid AddPersonToProjectRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
         projectService.addPersonToProject(projectId, request, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }

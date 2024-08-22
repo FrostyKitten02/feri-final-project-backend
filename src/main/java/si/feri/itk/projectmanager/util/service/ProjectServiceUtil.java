@@ -166,6 +166,7 @@ public class ProjectServiceUtil {
     }
     
     public static void validateAddPersonToProjectRequest(UUID projectId, AddPersonToProjectRequest request) {
+        //TODO validation with annotations, make custom validator or remove this code
         if (projectId == null) {
             throw new BadRequestException("Project id is required");
         }
@@ -185,10 +186,13 @@ public class ProjectServiceUtil {
         }
     }
 
-    public static PersonOnProject createNewPersonOnProject(Project project, Person person) {
+    public static PersonOnProject createNewPersonOnProject(Project project, Person person, LocalDate from, LocalDate to, BigDecimal estimatedPm) {
         PersonOnProject personOnProject = new PersonOnProject();
         personOnProject.setPersonId(person.getId());
         personOnProject.setProjectId(project.getId());
+        personOnProject.setFrom(from);
+        personOnProject.setTo(to);
+        personOnProject.setEstimatedPm(estimatedPm);
         return personOnProject;
     }
 }
