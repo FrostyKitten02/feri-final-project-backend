@@ -44,6 +44,7 @@ public class ClerkService {
             return;
         }
 
+        //if save throws then we probably have person with same email added
         Person newPerson = PersonUtil.createNewPersonFromClerkUser(event.getUser());
         personRepo.save(newPerson);
     }
