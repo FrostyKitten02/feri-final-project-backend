@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import si.feri.itk.projectmanager.configuration.ModelConstants;
+import si.feri.itk.projectmanager.dto.common.IDuration;
 import si.feri.itk.projectmanager.interfaces.IProjectBudget;
 import si.feri.itk.projectmanager.model.BaseModel;
 import si.feri.itk.projectmanager.model.WorkPackage;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = ModelConstants.PROJECT_TABLE)
-public class Project extends BaseModel implements IProjectBudget {
+public class Project extends BaseModel implements IProjectBudget, IDuration {
     private String title;
     private String ownerId;//clerk id
     private LocalDate startDate;

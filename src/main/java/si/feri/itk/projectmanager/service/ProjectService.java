@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import si.feri.itk.projectmanager.dto.common.Duration;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonDto;
@@ -45,6 +46,7 @@ import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.repository.SalaryRepo;
+import si.feri.itk.projectmanager.util.DateUtil;
 import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.ProjectStartingSoonUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
@@ -174,10 +176,16 @@ public class ProjectService {
         return project.map(ProjectMapper.INSTANCE::toDto).orElseThrow( () -> new ItemNotFoundException("Project not found"));
     }
 
-    public void addPersonToProject(UUID projectId, AddPersonToProjectRequest request, HttpServletRequest servletRequest) {
+    public void addPersonToProject(UUID projectId, @Validated AddPersonToProjectRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
+
         ProjectServiceUtil.validateAddPersonToProjectRequest(projectId, request);
-        PersonOnProject personOnProject = createPersonOnProject(projectId, userId, request.getPersonId());
+        DateUtil.validateDurationStrict(request);
+
+        Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+        DateUtil.validateChildDuration(request, project);
+
+        PersonOnProject personOnProject = createPersonOnProject(project, request.getFrom(), request.getTo(), request.getEstimatedPm(), request.getPersonId());
         personOnProjectRepo.save(personOnProject);
     }
 
@@ -192,8 +200,7 @@ public class ProjectService {
         personOnProjectRepo.deleteAllByPersonIdAndProjectId(personId, projectId);
     }
 
-    private PersonOnProject createPersonOnProject(UUID projectId, String ownerId, UUID personId) {
-        Project project = projectRepo.findByIdAndOwnerId(projectId, ownerId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+    private PersonOnProject createPersonOnProject(Project project, LocalDate from, LocalDate to, BigDecimal estimatedPm, UUID personId) {
         Person person = personRepo.findById(personId).orElseThrow(() -> new ItemNotFoundException("Person not found"));
 
         Optional<PersonOnProject> personOnProjectDb = personOnProjectRepo.findFirstByProjectIdAndPersonId(project.getId(), person.getId());
@@ -202,7 +209,7 @@ public class ProjectService {
             throw new BadRequestException("Person is already on project");
         }
 
-        return ProjectServiceUtil.createNewPersonOnProject(project, person);
+        return ProjectServiceUtil.createNewPersonOnProject(project, person, from, to, estimatedPm);
     }
 
     public ListProjectResponse searchUsersProjects(PageInfoRequest pageInfoRequest, ProjectSortInfoRequest sortInfoRequest, ProjectListSearchParams searchParams, HttpServletRequest servletRequest) {

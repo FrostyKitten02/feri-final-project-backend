@@ -92,4 +92,22 @@ public class DateUtil {
         }
     }
 
+
+    public static void validateChildDuration(IDuration childDuration, IDuration parentDuration) {
+        if (childDuration.getEndDate() == null) {
+            if (childDuration.getStartDate().isBefore(parentDuration.getStartDate())) {
+                throw new BadRequestException("Start date is before parent start date");
+            }
+            return;
+        }
+
+        if (childDuration.getStartDate().isBefore(parentDuration.getStartDate())) {
+            throw new BadRequestException("Start date is before parent start date");
+        }
+
+        if (childDuration.getEndDate().isAfter(parentDuration.getEndDate())) {
+            throw new BadRequestException("Child end date is after parent end date");
+        }
+    }
+
 }
