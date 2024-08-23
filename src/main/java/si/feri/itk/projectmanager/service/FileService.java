@@ -10,7 +10,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
+import si.feri.itk.projectmanager.mapper.ProjectFileMapper;
 import si.feri.itk.projectmanager.model.BaseModel;
 import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.repository.ProjectFileRepo;
@@ -34,6 +36,14 @@ public class FileService {
     private final ProjectRepo projectRepo;
     private final ProjectFileRepo projectFileRepo;
 
+    public List<ProjectFileDto> getAllProjectFiles(@Valid @NotNull UUID projectId, HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Files not found"));
+        List<ProjectFile> projectFiles = projectFileRepo.findAllByProjectId(projectId);
+        
+        return projectFiles.stream().map(ProjectFileMapper.INSTANCE::toDto).toList();
+    }
+
     public FileService(@Value("${files.upload-root}") String fileRootPath, ProjectFileRepo projectFileRepo, ProjectRepo projectRepo) {
         if (StringUtil.isNullOrEmpty(fileRootPath)) {
             throw new RuntimeException("FAILED TO CREATE FileService BEAN: Missing file root path");
@@ -52,16 +62,19 @@ public class FileService {
         }
     }
 
-    public Resource downloadProjectFile(UUID projectFileID, HttpServletRequest servletRequest) {
+    public ProjectFile getProjectFile(@Valid @NotNull UUID projectFileID, HttpServletRequest servletRequest) {
         ProjectFile projectFile = projectFileRepo.findById(projectFileID).orElseThrow(() -> new ItemNotFoundException("File not found"));
 
         UUID projectId = projectFile.getProjectId();
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("File not found"));
+        return projectFile;
+    }
 
+    public Resource getProjectFiLeResource(@Valid @NotNull ProjectFile projectFile) {
         try {
             Path file = rootUploadFolder.resolve(projectFile.getStoredFilePath());
-            Resource resource = new UrlResource(file.toUri());
+            org.springframework.core.io.Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
                 return resource;

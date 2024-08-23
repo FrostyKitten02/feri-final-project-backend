@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonDto;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
@@ -29,18 +30,19 @@ import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
 import si.feri.itk.projectmanager.dto.response.person.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.project.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.project.ListProjectResponse;
+import si.feri.itk.projectmanager.dto.response.project.ProjectFilesResponse;
 import si.feri.itk.projectmanager.dto.response.project.ProjectListStatusResponse;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
 import si.feri.itk.projectmanager.dto.response.project.UpdateProjectResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
+import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.FileService;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,7 +134,7 @@ public class ProjectController {
 
 
     @PostMapping(
-            value = "/{projectId}/upload-file",
+            value = "{projectId}/upload-file",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResourceCreatedResponse uploadProjectFile(@RequestParam("files") MultipartFile[] files, @PathVariable UUID projectId, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         List<UUID> created = fileService.uploadProjectFiles(files, projectId, servletRequest);
@@ -143,15 +145,22 @@ public class ProjectController {
         return response;
     }
 
-
-    @GetMapping( "/files/{projectFileId}")
+    @GetMapping( "file/{projectFileId}")
     public ResponseEntity<Resource> download(@PathVariable UUID projectFileId, HttpServletRequest servletRequest) {
-        Resource resource = fileService.downloadProjectFile(projectFileId, servletRequest);
-
+        ProjectFile projectFile = fileService.getProjectFile(projectFileId, servletRequest);
+        Resource resource = fileService.getProjectFiLeResource(projectFile);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + projectFile.getOriginalFileName() + "\"")
                 .body(resource);
     }
 
+    @GetMapping("/{projectId}/files")
+    public ProjectFilesResponse getProjectFiles(UUID projectId, HttpServletRequest servletRequest) {
+        List<ProjectFileDto> files = fileService.getAllProjectFiles(projectId, servletRequest);
+
+        ProjectFilesResponse response = new ProjectFilesResponse();
+        response.setFiles(files);
+        return response;
+    }
 }
