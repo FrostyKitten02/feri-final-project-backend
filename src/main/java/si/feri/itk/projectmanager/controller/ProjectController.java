@@ -149,6 +149,7 @@ public class ProjectController {
         Resource resource = fileService.downloadProjectFile(projectFileId, servletRequest);
 
         return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
