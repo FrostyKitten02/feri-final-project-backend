@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
+import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.mapper.ProjectFileMapper;
 import si.feri.itk.projectmanager.model.BaseModel;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,6 +73,21 @@ public class FileService {
         return projectFile;
     }
 
+    @Transactional
+    public void deleteProjectFile(@Valid @NotNull UUID projectFileID, HttpServletRequest servletRequest) {
+        ProjectFile projectFile = projectFileRepo.findById(projectFileID).orElseThrow(() -> new ItemNotFoundException("File not found"));
+
+        UUID projectId = projectFile.getProjectId();
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("File not found"));
+
+        projectFileRepo.delete(projectFile);
+        boolean deleteSuccess = deleteProjectFile(projectFile);
+        if (!deleteSuccess) {
+            throw new InternalServerException("Failed to delete project file " + projectFile.getProjectId());
+        }
+    }
+
     public Resource getProjectFiLeResource(@Valid @NotNull ProjectFile projectFile) {
         try {
             Path file = rootUploadFolder.resolve(projectFile.getStoredFilePath());
@@ -96,8 +113,8 @@ public class FileService {
         for (MultipartFile file : files) {
             ProjectFile savedFile = uploadProjectFile(file, projectId);
             if (savedFile == null) {
-                //TODO handle delete all already saved files!!!
-                return null;
+                deleteProjectFiles(saved);
+                throw new InternalServerException("Error while saving files");
             }
 
             saved.add(savedFile);
@@ -122,6 +139,31 @@ public class FileService {
             return projectFileRepo.save(projectFile);
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    private void deleteProjectFiles(List<ProjectFile> files) {
+        for (ProjectFile projectFile : files) {
+            deleteProjectFile(projectFile);
+        }
+    }
+
+    private boolean deleteProjectFile(ProjectFile projectFile) {
+        Resource resource = getProjectFiLeResource(projectFile);
+        try {
+            File file = resource.getFile();
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    log.error("Failed to delete file {}", file.getAbsoluteFile());
+                }
+                return deleted;
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to delete file {}", projectFile.getStoredFilePath());
+            log.error(e.getLocalizedMessage(), e);
+            return false;
         }
     }
 

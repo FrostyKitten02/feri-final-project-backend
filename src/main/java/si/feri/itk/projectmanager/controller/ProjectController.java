@@ -155,7 +155,12 @@ public class ProjectController {
                 .body(resource);
     }
 
-    @GetMapping("/{projectId}/files")
+    @DeleteMapping("file/{projectFileId}")
+    public void deleteProjectFile(@PathVariable UUID projectFileId, HttpServletRequest servletRequest) {
+        fileService.deleteProjectFile(projectFileId, servletRequest);
+    }
+
+    @GetMapping("{projectId}/files")
     public ProjectFilesResponse getProjectFiles(UUID projectId, HttpServletRequest servletRequest) {
         List<ProjectFileDto> files = fileService.getAllProjectFiles(projectId, servletRequest);
 
