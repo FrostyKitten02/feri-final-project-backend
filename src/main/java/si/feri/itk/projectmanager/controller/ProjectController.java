@@ -161,7 +161,7 @@ public class ProjectController {
     }
 
     @GetMapping("{projectId}/files")
-    public ProjectFilesResponse getProjectFiles(UUID projectId, HttpServletRequest servletRequest) {
+    public ProjectFilesResponse getProjectFiles(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
         List<ProjectFileDto> files = fileService.getAllProjectFiles(projectId, servletRequest);
 
         ProjectFilesResponse response = new ProjectFilesResponse();
