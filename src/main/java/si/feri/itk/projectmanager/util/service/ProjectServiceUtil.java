@@ -190,8 +190,8 @@ public class ProjectServiceUtil {
         PersonOnProject personOnProject = new PersonOnProject();
         personOnProject.setPersonId(person.getId());
         personOnProject.setProjectId(project.getId());
-        personOnProject.setFrom(from);
-        personOnProject.setTo(to);
+        personOnProject.setFromDate(from);
+        personOnProject.setToDate(to);
         personOnProject.setEstimatedPm(estimatedPm);
         return personOnProject;
     }

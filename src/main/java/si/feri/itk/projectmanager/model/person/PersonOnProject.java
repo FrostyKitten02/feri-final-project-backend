@@ -17,8 +17,8 @@ import java.util.UUID;
 public class PersonOnProject extends BaseModel {
     private UUID projectId;
     private UUID personId;
-    private LocalDate from;
-    private LocalDate to;
+    private LocalDate fromDate;
+    private LocalDate toDate;
     @Column(precision = 4, scale = 3)
     private BigDecimal estimatedPm;
 }

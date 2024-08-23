@@ -139,7 +139,7 @@ public class ProjectServiceUtilTest {
         Assertions.assertEquals(project.getId(), personOnProject.getProjectId());
         Assertions.assertEquals(person.getId(), personOnProject.getPersonId());
         Assertions.assertEquals(BigDecimal.ONE, personOnProject.getEstimatedPm());
-        Assertions.assertEquals(date, personOnProject.getFrom());
-        Assertions.assertEquals(date, personOnProject.getTo());
+        Assertions.assertEquals(date, personOnProject.getFromDate());
+        Assertions.assertEquals(date, personOnProject.getToDate());
     }
 }
