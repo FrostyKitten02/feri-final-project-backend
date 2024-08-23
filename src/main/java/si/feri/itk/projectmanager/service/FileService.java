@@ -1,27 +1,24 @@
 package si.feri.itk.projectmanager.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
 import si.feri.itk.projectmanager.model.BaseModel;
 import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.repository.ProjectFileRepo;
+import si.feri.itk.projectmanager.repository.ProjectRepo;
+import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,12 +31,15 @@ import java.util.UUID;
 @Service
 public class FileService {
     private final Path rootUploadFolder;
+    private final ProjectRepo projectRepo;
     private final ProjectFileRepo projectFileRepo;
 
-    public FileService(@Value("${files.upload-root}") String fileRootPath, ProjectFileRepo projectFileRepo) {
+    public FileService(@Value("${files.upload-root}") String fileRootPath, ProjectFileRepo projectFileRepo, ProjectRepo projectRepo) {
         if (StringUtil.isNullOrEmpty(fileRootPath)) {
             throw new RuntimeException("FAILED TO CREATE FileService BEAN: Missing file root path");
         }
+
+        this.projectRepo = projectRepo;
         this.rootUploadFolder = Paths.get(fileRootPath);
         this.projectFileRepo = projectFileRepo;
 
@@ -52,8 +52,12 @@ public class FileService {
         }
     }
 
-    public Resource downloadProjectFile(UUID projectFileID) throws FileNotFoundException {
+    public Resource downloadProjectFile(UUID projectFileID, HttpServletRequest servletRequest) {
         ProjectFile projectFile = projectFileRepo.findById(projectFileID).orElseThrow(() -> new ItemNotFoundException("File not found"));
+
+        UUID projectId = projectFile.getProjectId();
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("File not found"));
 
         try {
             Path file = rootUploadFolder.resolve(projectFile.getStoredFilePath());
@@ -71,7 +75,10 @@ public class FileService {
     }
 
     @Transactional
-    public List<UUID> uploadProjectFiles(MultipartFile[] files, @Valid @NotNull UUID projectId) {
+    public List<UUID> uploadProjectFiles(MultipartFile[] files, @Valid @NotNull UUID projectId, HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+
         List<ProjectFile> saved = new ArrayList<>(files.length);
         for (MultipartFile file : files) {
             ProjectFile savedFile = uploadProjectFile(file, projectId);
