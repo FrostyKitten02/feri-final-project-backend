@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import si.feri.itk.projectmanager.configuration.FileUploadConfig;
@@ -20,11 +19,10 @@ import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.repository.ProjectFileRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
+import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +54,10 @@ public class FileService {
         return projectFile;
     }
 
+    public Resource getProjectFileResource(ProjectFile projectFile) {
+        return FileServiceUtil.getProjectFileResource(projectFile, uploadConfig.getRootUploadFolder());
+    }
+
     @Transactional
     public void deleteProjectFile(@Valid @NotNull UUID projectFileID, HttpServletRequest servletRequest) {
         ProjectFile projectFile = projectFileRepo.findById(projectFileID).orElseThrow(() -> new ItemNotFoundException("File not found"));
@@ -65,25 +67,11 @@ public class FileService {
         projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("File not found"));
 
         projectFileRepo.delete(projectFile);
-        boolean deleteSuccess = deleteProjectFile(projectFile);
+        boolean deleteSuccess = FileServiceUtil.deleteProjectFile(projectFile, uploadConfig.getRootUploadFolder());
         if (!deleteSuccess) {
             throw new InternalServerException("Failed to delete project file " + projectFile.getProjectId());
-        }
-    }
-
-    public Resource getProjectFileResource(@Valid @NotNull ProjectFile projectFile) {
-        try {
-            Path file = fileUploadConfig.getRootUploadFolder().resolve(projectFile.getStoredFilePath());
-            org.springframework.core.io.Resource resource = new UrlResource(file.toUri());
-
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                log.error("File not found: {}", file.toFile().getAbsolutePath());
-                throw new ItemNotFoundException("File not found");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+        } else {
+            projectFileRepo.delete(projectFile);
         }
     }
 
@@ -111,7 +99,7 @@ public class FileService {
     protected ProjectFile uploadProjectFile(MultipartFile file, UUID projectId) {
         ProjectFile saved = null;
         try {
-            String extension = getUploadedFileExtension(file);
+            String extension = FileServiceUtil.getUploadedFileExtension(file);
             String projectFileName = UUID.randomUUID() + "." + extension;
             ProjectFile projectFile = new ProjectFile();
             projectFile.setOriginalFileName(file.getOriginalFilename());
@@ -135,44 +123,11 @@ public class FileService {
 
     private void deleteProjectFiles(List<ProjectFile> files) {
         for (ProjectFile projectFile : files) {
-            deleteProjectFile(projectFile);
-        }
-    }
-
-    private boolean deleteProjectFile(ProjectFile projectFile) {
-        Resource resource = getProjectFileResource(projectFile);
-        try {
-            File file = resource.getFile();
-            if (file.exists()) {
-                boolean deleted = file.delete();
-                if (!deleted) {
-                    log.error("Failed to delete file {}", file.getAbsoluteFile());
-                }
-
-                if (projectFile.getId() != null) {
-                    projectFileRepo.delete(projectFile);
-                }
-                return deleted;
+            boolean deleted = FileServiceUtil.deleteProjectFile(projectFile, uploadConfig.getRootUploadFolder());
+            if (deleted) {
+                projectFileRepo.delete(projectFile);
             }
-            return true;
-        } catch (Exception e) {
-            log.error("Failed to delete file {}", projectFile.getStoredFilePath());
-            log.error(e.getLocalizedMessage(), e);
-            return false;
         }
     }
 
-    private String getUploadedFileExtension(MultipartFile file) {
-        String name = file.getOriginalFilename();
-        if (name == null) {
-            return null;
-        }
-        int firstExtension = name.indexOf(".");
-
-        if (firstExtension == -1) {
-            return null;
-        }
-
-        return name.substring(firstExtension + 1);
-    }
 }

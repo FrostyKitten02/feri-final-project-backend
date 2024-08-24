@@ -42,6 +42,7 @@ import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.FileService;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
+import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 
 import java.util.List;
 import java.util.UUID;
