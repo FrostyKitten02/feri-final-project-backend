@@ -4,12 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import si.feri.itk.projectmanager.configuration.FileUploadConfig;
 import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
 import si.feri.itk.projectmanager.exceptions.implementation.InternalServerException;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
@@ -19,23 +20,23 @@ import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.repository.ProjectFileRepo;
 import si.feri.itk.projectmanager.repository.ProjectRepo;
 import si.feri.itk.projectmanager.util.RequestUtil;
-import si.feri.itk.projectmanager.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FileService {
-    private final Path rootUploadFolder;
+    private final FileUploadConfig uploadConfig;
     private final ProjectRepo projectRepo;
     private final ProjectFileRepo projectFileRepo;
+    private final FileUploadConfig fileUploadConfig;
 
     public List<ProjectFileDto> getAllProjectFiles(@Valid @NotNull UUID projectId, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
@@ -45,23 +46,6 @@ public class FileService {
         return projectFiles.stream().map(ProjectFileMapper.INSTANCE::toDto).toList();
     }
 
-    public FileService(@Value("${files.upload-root}") String fileRootPath, ProjectFileRepo projectFileRepo, ProjectRepo projectRepo) {
-        if (StringUtil.isNullOrEmpty(fileRootPath)) {
-            throw new RuntimeException("FAILED TO CREATE FileService BEAN: Missing file root path");
-        }
-
-        this.projectRepo = projectRepo;
-        this.rootUploadFolder = Paths.get(fileRootPath);
-        this.projectFileRepo = projectFileRepo;
-
-        File rootDir = rootUploadFolder.toFile();
-        if (!rootDir.exists()) {
-            boolean crated = rootDir.mkdirs();
-            if (!crated) {
-                throw new RuntimeException("FAILED TO CREATE FileService BEAN: Failed to create root directory " + fileRootPath);
-            }
-        }
-    }
 
     public ProjectFile getProjectFile(@Valid @NotNull UUID projectFileID, HttpServletRequest servletRequest) {
         ProjectFile projectFile = projectFileRepo.findById(projectFileID).orElseThrow(() -> new ItemNotFoundException("File not found"));
@@ -89,7 +73,7 @@ public class FileService {
 
     public Resource getProjectFileResource(@Valid @NotNull ProjectFile projectFile) {
         try {
-            Path file = rootUploadFolder.resolve(projectFile.getStoredFilePath());
+            Path file = fileUploadConfig.getRootUploadFolder().resolve(projectFile.getStoredFilePath());
             org.springframework.core.io.Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -139,7 +123,7 @@ public class FileService {
 
             //TODO check bytes written!!!
             saved = projectFileRepo.save(projectFile);
-            long written = Files.copy(file.getInputStream(), rootUploadFolder.resolve(projectFileName));
+            long written = Files.copy(file.getInputStream(), fileUploadConfig.getRootUploadFolder().resolve(projectFileName));
         } catch (IOException e) {
             log.error("Error while saving file to server", e);
         } catch (Exception e) {
