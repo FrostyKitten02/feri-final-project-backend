@@ -18,25 +18,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonDto;
-import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
+import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
+import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
+import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.dto.response.person.GetPeopleResponse;
 import si.feri.itk.projectmanager.dto.response.project.GetProjectResponse;
 import si.feri.itk.projectmanager.dto.response.project.ListProjectResponse;
 import si.feri.itk.projectmanager.dto.response.project.ProjectFilesResponse;
 import si.feri.itk.projectmanager.dto.response.project.ProjectListStatusResponse;
-import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
-import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
 import si.feri.itk.projectmanager.dto.response.project.UpdateProjectResponse;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
-import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.FileService;
@@ -133,10 +133,19 @@ public class ProjectController {
     }
 
 
-    @PostMapping(
-            value = "{projectId}/upload-file",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResourceCreatedResponse uploadProjectFile(@RequestParam("files") MultipartFile[] files, @PathVariable UUID projectId, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+
+    @RequestMapping(
+            path = "{projectId}/upload-file",
+            method = RequestMethod.POST,
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResourceCreatedResponse uploadProjectFile(
+            @RequestBody MultipartFile[] files,
+            @PathVariable UUID projectId,
+            HttpServletRequest servletRequest,
+            HttpServletResponse servletResponse
+    ) {
         List<UUID> created = fileService.uploadProjectFiles(files, projectId, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
 
