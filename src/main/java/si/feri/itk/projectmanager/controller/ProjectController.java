@@ -157,7 +157,7 @@ public class ProjectController {
     @GetMapping( "file/{projectFileId}")
     public ResponseEntity<Resource> download(@PathVariable UUID projectFileId, HttpServletRequest servletRequest) {
         ProjectFile projectFile = fileService.getProjectFile(projectFileId, servletRequest);
-        Resource resource = fileService.getProjectFiLeResource(projectFile);
+        Resource resource = fileService.getProjectFileResource(projectFile);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + projectFile.getOriginalFileName() + "\"")

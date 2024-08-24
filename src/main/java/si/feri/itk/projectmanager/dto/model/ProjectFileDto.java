@@ -11,6 +11,7 @@ import java.util.UUID;
 public class ProjectFileDto {
     private UUID id;
     private Instant createdAt;
+    private String contentType;
     private String originalFileName;
     private int fileSizeMB;
 }

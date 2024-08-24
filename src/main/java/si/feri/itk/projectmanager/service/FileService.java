@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -88,7 +87,7 @@ public class FileService {
         }
     }
 
-    public Resource getProjectFiLeResource(@Valid @NotNull ProjectFile projectFile) {
+    public Resource getProjectFileResource(@Valid @NotNull ProjectFile projectFile) {
         try {
             Path file = rootUploadFolder.resolve(projectFile.getStoredFilePath());
             org.springframework.core.io.Resource resource = new UrlResource(file.toUri());
@@ -113,6 +112,7 @@ public class FileService {
         for (MultipartFile file : files) {
             ProjectFile savedFile = uploadProjectFile(file, projectId);
             if (savedFile == null) {
+                //this is the inner function mentioned above
                 deleteProjectFiles(saved);
                 throw new InternalServerException("Error while saving files");
             }
@@ -123,7 +123,9 @@ public class FileService {
         return saved.stream().map(BaseModel::getId).toList();
     }
 
-    private ProjectFile uploadProjectFile(MultipartFile file, UUID projectId) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected ProjectFile uploadProjectFile(MultipartFile file, UUID projectId) {
+        ProjectFile saved = null;
         try {
             String extension = getUploadedFileExtension(file);
             String projectFileName = UUID.randomUUID() + "." + extension;
@@ -131,15 +133,20 @@ public class FileService {
             projectFile.setOriginalFileName(file.getOriginalFilename());
             projectFile.setStoredFilePath(projectFileName);
             projectFile.setProjectId(projectId);
+            projectFile.setContentType(file.getContentType());
             int sizeMB = file.getBytes().length / 1_000_000;
             projectFile.setFileSizeMB(sizeMB);
 
             //TODO check bytes written!!!
+            saved = projectFileRepo.save(projectFile);
             long written = Files.copy(file.getInputStream(), rootUploadFolder.resolve(projectFileName));
-            return projectFileRepo.save(projectFile);
         } catch (IOException e) {
-            return null;
+            log.error("Error while saving file to server", e);
+        } catch (Exception e) {
+            log.error("Error while uploadind file, probably something went wrong saving to db");
         }
+
+        return saved;
     }
 
     private void deleteProjectFiles(List<ProjectFile> files) {
@@ -149,13 +156,17 @@ public class FileService {
     }
 
     private boolean deleteProjectFile(ProjectFile projectFile) {
-        Resource resource = getProjectFiLeResource(projectFile);
+        Resource resource = getProjectFileResource(projectFile);
         try {
             File file = resource.getFile();
             if (file.exists()) {
                 boolean deleted = file.delete();
                 if (!deleted) {
                     log.error("Failed to delete file {}", file.getAbsoluteFile());
+                }
+
+                if (projectFile.getId() != null) {
+                    projectFileRepo.delete(projectFile);
                 }
                 return deleted;
             }
