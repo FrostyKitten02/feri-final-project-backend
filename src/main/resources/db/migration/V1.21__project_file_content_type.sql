@@ -1,0 +1,1 @@
+alter table project_file add column content_type text;

@@ -16,6 +16,7 @@ public class ProjectFile extends BaseModel {
     private UUID projectId;
     private String originalFileName;
     private String storedFilePath;
+    private String contentType;
     @Column(name = "size_MB")
     private int fileSizeMB;
 }

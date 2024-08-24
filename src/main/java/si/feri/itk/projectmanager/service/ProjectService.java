@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import si.feri.itk.projectmanager.configuration.FileUploadConfig;
 import si.feri.itk.projectmanager.dto.common.Duration;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonDto;
@@ -29,6 +30,7 @@ import si.feri.itk.projectmanager.mapper.ProjectMapper;
 import si.feri.itk.projectmanager.model.Occupancy;
 import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.ProjectBudgetSchema;
+import si.feri.itk.projectmanager.model.project.ProjectFile;
 import si.feri.itk.projectmanager.model.project.ProjectList;
 import si.feri.itk.projectmanager.model.ProjectStartingSoonEmailQueue;
 import si.feri.itk.projectmanager.model.person.Person;
@@ -41,6 +43,7 @@ import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
 import si.feri.itk.projectmanager.repository.ProjectBudgetSchemaRepo;
+import si.feri.itk.projectmanager.repository.ProjectFileRepo;
 import si.feri.itk.projectmanager.repository.ProjectStartingSoonEmailQueueRepo;
 import si.feri.itk.projectmanager.repository.WorkPackageRepo;
 import si.feri.itk.projectmanager.repository.projectlist.ProjectListRepo;
@@ -51,6 +54,7 @@ import si.feri.itk.projectmanager.util.ProjectBudgetUtil;
 import si.feri.itk.projectmanager.util.ProjectStartingSoonUtil;
 import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.StatisticUtil;
+import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
 import java.math.BigDecimal;
@@ -71,7 +75,9 @@ public class ProjectService {
     private final ProjectRepo projectRepo;
     private final OccupancyRepo occupancyRepo;
     private final WorkPackageRepo workPackageRepo;
+    private final ProjectFileRepo projectFileRepo;
     private final ProjectListRepo projectListRepo;
+    private final FileUploadConfig fileUploadConfig;
     private final PersonOnProjectRepo personOnProjectRepo;
     private final ProjectBudgetSchemaRepo projectBudgetSchemaRepo;
     private final ProjectStartingSoonEmailQueueRepo projectStartingSoonEmailQueueRepo;
@@ -103,10 +109,25 @@ public class ProjectService {
 
         final String userId = RequestUtil.getUserIdStrict(req);
         final Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
+
         personOnProjectRepo.deleteAllByProjectId(projectId);
         occupancyRepo.deleteAllByProjectId(projectId);
-        projectRepo.delete(project);
         projectStartingSoonEmailQueueRepo.deleteAllByProjectId(projectId);
+        deleteProjectFiles(projectId);
+        projectRepo.delete(project);
+    }
+
+    //TODO somehow handle if parent method doesnt complete so we dont delete files
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void deleteProjectFiles(UUID projectId) {
+        List<ProjectFile> projectFiles = projectFileRepo.findAllByProjectId(projectId);
+        for (ProjectFile projectFile : projectFiles) {
+            boolean deleted = FileServiceUtil.deleteProjectFile(projectFile, fileUploadConfig.getRootUploadFolder());
+            if (!deleted) {
+                log.error("Failed to delete project file {}", projectFile.getStoredFilePath());
+            }
+            projectFileRepo.delete(projectFile);
+        }
     }
 
     @Transactional

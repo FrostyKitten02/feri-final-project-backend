@@ -42,6 +42,7 @@ import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.FileService;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
+import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -157,7 +158,7 @@ public class ProjectController {
     @GetMapping( "file/{projectFileId}")
     public ResponseEntity<Resource> download(@PathVariable UUID projectFileId, HttpServletRequest servletRequest) {
         ProjectFile projectFile = fileService.getProjectFile(projectFileId, servletRequest);
-        Resource resource = fileService.getProjectFiLeResource(projectFile);
+        Resource resource = fileService.getProjectFileResource(projectFile);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + projectFile.getOriginalFileName() + "\"")
