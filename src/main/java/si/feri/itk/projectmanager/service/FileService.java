@@ -55,7 +55,11 @@ public class FileService {
     }
 
     public Resource getProjectFileResource(ProjectFile projectFile) {
-        return FileServiceUtil.getProjectFileResource(projectFile, uploadConfig.getRootUploadFolder());
+        Resource resource = FileServiceUtil.getProjectFileResource(projectFile, uploadConfig.getRootUploadFolder());
+        if (resource == null) {
+            throw new ItemNotFoundException("File not found");
+        }
+        return resource;
     }
 
     @Transactional
