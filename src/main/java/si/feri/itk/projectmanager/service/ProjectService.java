@@ -20,7 +20,7 @@ import si.feri.itk.projectmanager.dto.response.project.ListProjectResponse;
 import si.feri.itk.projectmanager.dto.response.project.ProjectListStatusResponse;
 import si.feri.itk.projectmanager.dto.request.project.UpdateProjectRequest;
 import si.feri.itk.projectmanager.dto.response.statistics.PersonWorkDto;
-import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
+import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsUnitDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.dto.request.project.ProjectSortInfoRequest;
 import si.feri.itk.projectmanager.exceptions.implementation.BadRequestException;
@@ -58,6 +58,7 @@ import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 import si.feri.itk.projectmanager.util.service.ProjectServiceUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -240,10 +241,10 @@ public class ProjectService {
         return ListProjectResponse.fromPage(projectsPage);
     }
 
-    public ProjectStatisticsResponse getProjectStatistics(UUID projectId, HttpServletRequest servletRequest) {
+    public ProjectStatisticsResponse getProjectStatistics(UUID projectId, LocalDate from, Integer monthsNumber, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
-        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project);
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, from.withDayOfMonth(1), monthsNumber);
 
         List<Person> people = personRepo.findAllByProjectId(projectId);
         Map<UUID, PersonDto> peopleMap = people.stream().collect(Collectors.toMap(Person::getId, PersonMapper.INSTANCE::toDto));
@@ -282,33 +283,49 @@ public class ProjectService {
     }
 
     private void calculateProjectSalaryStats(ProjectStatisticsResponse response, List<Person> people, UUID projectId) {
-        for (ProjectMonthDto month : response.getMonths()) {
+        for (ProjectStatisticsUnitDto unit : response.getUnits()) {
             ArrayList<PersonWorkDto> personWorkDtos = new ArrayList<>(people.size());
             for (Person p : people) {
                 PersonWorkDto personWorkDto = new PersonWorkDto();
                 personWorkDto.setPersonId(p.getId());
-                Optional<Occupancy> occupancyOpt = occupancyRepo.findByMonthAndPersonIdAndProjectId(month.getDate(), p.getId(), projectId);
-                if (occupancyOpt.isPresent()) {
-                    Occupancy occupancy = occupancyOpt.get();
-                    personWorkDto.setOccupancyId(occupancy.getId());
-                    personWorkDto.setTotalWorkPm(occupancy.getValue());
-                } else {
-                    personWorkDto.setOccupancyId(null);
-                    personWorkDto.setTotalWorkPm(BigDecimal.ZERO);
-                }
-                personWorkDto.setAvgSalary(calculateAvgSalaryForMonth(month, p.getId()));
-                month.addWorkPm(personWorkDto.getTotalWorkPm());
-                month.addActualSpending(personWorkDto.getAvgSalary().multiply(personWorkDto.getTotalWorkPm()));
+                List<Occupancy> occupancies = occupancyRepo.findAllBetweenMonthsAndPersonIdAndProjectId(unit.getStartDate(), unit.getEndDate(), p.getId(), projectId);
 
+                if (occupancies.isEmpty()) {
+                    continue;
+                }
+
+                if (unit.isMonthUnit()) {
+                    if (occupancies.size() > 1) {
+                        throw new RuntimeException("More than one occupancy for month unit");
+                    }
+
+                    personWorkDto.setOccupancyId(occupancies.getFirst().getId());
+                }
+
+                BigDecimal monthSalarySum = BigDecimal.ZERO;
+                for (Occupancy o : occupancies) {
+                    personWorkDto.addTotalWorkPm(o.getValue());
+                    BigDecimal monthAvg = calculateAvgSalaryForMonth(o.getMonth(), p.getId());
+                    BigDecimal monthSalary = monthAvg.multiply(o.getValue());
+                    personWorkDto.addTotalSalary(monthSalary);
+
+                    monthSalarySum = monthSalarySum.add(monthAvg);
+                }
+                final BigDecimal avgUnitSalary = monthSalarySum.divide(BigDecimal.valueOf(occupancies.size()), RoundingMode.CEILING);
+                personWorkDto.setAvgSalary(avgUnitSalary);
+
+
+                unit.addWorkPm(personWorkDto.getTotalWorkPm());
+                unit.addActualSpending(personWorkDto.getTotalSalary());
                 personWorkDtos.add(personWorkDto);
             }
-            month.setPersonWork(personWorkDtos);
+            unit.setPersonWork(personWorkDtos);
         }
     }
 
-    private BigDecimal calculateAvgSalaryForMonth(ProjectMonthDto month, UUID personId) {
-        List<Salary> salaries = salaryRepo.getPersonActiveSalariesInMonth(month.getDate().getMonthValue(), month.getDate().getYear(), personId);
-        return StatisticUtil.calculateAvgMonthSalary(salaries, month.getDate().getMonthValue(), month.getDate().getYear());
+    private BigDecimal calculateAvgSalaryForMonth(LocalDate startDate, UUID personId) {
+        List<Salary> salaries = salaryRepo.getPersonActiveSalariesInMonth(startDate.getMonthValue(), startDate.getYear(), personId);
+        return StatisticUtil.calculateAvgMonthSalary(salaries, startDate.getMonthValue(), startDate.getYear());
     }
 
 }

@@ -34,6 +34,13 @@ public interface OccupancyRepo extends JpaRepository<Occupancy, UUID> {
             "AND o.projectId = :projectId ")
     Optional<Occupancy> findByMonthAndPersonIdAndProjectId(LocalDate month, UUID personId, UUID projectId);
 
+    @Query("SELECT o FROM Occupancy o " +
+            "WHERE o.month <= :monthTo " +
+            "AND o.month >= :monthFrom " +
+            "AND o.personId = :personId " +
+            "AND o.projectId = :projectId ")
+    List<Occupancy> findAllBetweenMonthsAndPersonIdAndProjectId(LocalDate monthFrom, LocalDate monthTo, UUID personId, UUID projectId);
+
     @Query("SELECT MIN(o.month) " +
             "FROM Occupancy o " +
             "WHERE o.projectId = :projectId ")

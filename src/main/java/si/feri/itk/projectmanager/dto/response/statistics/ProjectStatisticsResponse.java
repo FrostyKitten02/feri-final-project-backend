@@ -12,6 +12,6 @@ import java.util.UUID;
 @Setter
 public class ProjectStatisticsResponse {
     private List<WorkPackageWithStatisticsDto> workPackages;
-    private List<ProjectMonthDto> months;
+    private List<ProjectStatisticsUnitDto> units;
     private Map<UUID, PersonDto> people;
 }

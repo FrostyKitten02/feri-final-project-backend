@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
@@ -44,6 +45,7 @@ import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
 import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -124,8 +126,13 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/statistics")
-    public ProjectStatisticsResponse getProjectStatistics(@PathVariable @NotNull UUID projectId, HttpServletRequest servletRequest) {
-        return projectService.getProjectStatistics(projectId, servletRequest);
+    public ProjectStatisticsResponse getProjectStatistics(
+            @PathVariable @NotNull UUID projectId,
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) Integer monthsNumber,
+            HttpServletRequest servletRequest
+    ) {
+        return projectService.getProjectStatistics(projectId, from, monthsNumber, servletRequest);
     }
 
     @GetMapping("/list/status")

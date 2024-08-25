@@ -110,4 +110,12 @@ public class DateUtil {
         }
     }
 
+    public static boolean isDateInDuration(LocalDate date, IDuration duration) {
+        if (date.isBefore(duration.getStartDate()) || date.isAfter(duration.getEndDate())) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
