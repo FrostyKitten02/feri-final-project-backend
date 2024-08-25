@@ -7,18 +7,22 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import si.feri.itk.projectmanager.dto.request.occupancy.CreateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.request.occupancy.UpdateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.response.ResourceCreatedResponse;
 import si.feri.itk.projectmanager.dto.response.occupancy.CreateOccupancyResponse;
+import si.feri.itk.projectmanager.dto.response.occupancy.MonthlyPersonOccupancyResponse;
 import si.feri.itk.projectmanager.service.OccupancyService;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 
@@ -49,5 +53,9 @@ public class OccupancyController {
         occupancyService.deleteOccupancy(occupancyId, servletRequest);
     }
 
+    @GetMapping("/monthly/person-id/{personId}")
+    public MonthlyPersonOccupancyResponse getMonthlyPersonOccupancy(@RequestParam LocalDate fromMonth, @RequestParam LocalDate toMonth, @PathVariable UUID personId) {
+        return occupancyService.getMonthlyPersonOccupancy(fromMonth, toMonth, personId);
+    }
 
 }
