@@ -43,7 +43,6 @@ import si.feri.itk.projectmanager.paging.request.PageInfoRequest;
 import si.feri.itk.projectmanager.service.FileService;
 import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
-import si.feri.itk.projectmanager.util.service.FileServiceUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -129,10 +128,10 @@ public class ProjectController {
     public ProjectStatisticsResponse getProjectStatistics(
             @PathVariable @NotNull UUID projectId,
             @RequestParam(required = false) LocalDate from,
-            @RequestParam(required = false) Integer monthsNumber,
+            @RequestParam(required = false) Integer monthsPerUnit,
             HttpServletRequest servletRequest
     ) {
-        return projectService.getProjectStatistics(projectId, from, monthsNumber, servletRequest);
+        return projectService.getProjectStatistics(projectId, from, monthsPerUnit, servletRequest);
     }
 
     @GetMapping("/list/status")

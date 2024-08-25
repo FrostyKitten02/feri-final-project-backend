@@ -80,7 +80,7 @@ public class StatisticUtil {
     }
 
     private static void setUnitStaffBudgetBurnDownRate(List<ProjectStatisticsUnitDto> projectStatisticsUnitDtos, Project project) {
-        BigDecimal totalPms = projectStatisticsUnitDtos.stream().reduce(BigDecimal.ZERO, (acc, month) -> acc.add(month.getPmBurnDownRate()), BigDecimal::add);
+        BigDecimal totalPms = projectStatisticsUnitDtos.stream().reduce(BigDecimal.ZERO, (acc, unit) -> acc.add(unit.getPmBurnDownRate()), BigDecimal::add);
         BigDecimal totalBudget = project.getStaffBudget();
         if (totalPms.compareTo(BigDecimal.ZERO) <= 0 || totalBudget.compareTo(BigDecimal.ZERO) <= 0) {
             log.warn("Could not calculate staff budget burn down rates for project with id: {}, totalPms: {}, totalBudget: {}", project.getId(), totalPms.floatValue(), totalBudget.floatValue());
@@ -88,8 +88,8 @@ public class StatisticUtil {
         }
 
         for (ProjectStatisticsUnitDto unit : projectStatisticsUnitDtos) {
-            BigDecimal monthBudgetPercentage = unit.getPmBurnDownRate().divide(totalPms, RoundingMode.UP);
-            BigDecimal unitBudget = totalBudget.multiply(monthBudgetPercentage);
+            BigDecimal unitBudgetPercentage = unit.getPmBurnDownRate().divide(totalPms, RoundingMode.UP);
+            BigDecimal unitBudget = totalBudget.multiply(unitBudgetPercentage);
             unit.setStaffBudgetBurnDownRate(unitBudget);
         }
     }
@@ -143,11 +143,11 @@ public class StatisticUtil {
         List<ProjectStatisticsUnitDto> projectStatisticsUnitDtos = new ArrayList<>();
         int unitNumber = 1;
         while (!DateUtil.isMonthAfter(firstDate, endDate)) {
-            ProjectStatisticsUnitDto month = new ProjectStatisticsUnitDto();
-            month.setStartDate(firstDate);
-            month.setEndDate(lastDate);
-            month.setUnitNumber(unitNumber++);
-            projectStatisticsUnitDtos.add(month);
+            ProjectStatisticsUnitDto unit = new ProjectStatisticsUnitDto();
+            unit.setStartDate(firstDate);
+            unit.setEndDate(lastDate);
+            unit.setUnitNumber(unitNumber++);
+            projectStatisticsUnitDtos.add(unit);
             firstDate = firstDate.plusMonths(monthsPerUnit);
 
             lastDate = lastDate.plusMonths(monthsPerUnit);

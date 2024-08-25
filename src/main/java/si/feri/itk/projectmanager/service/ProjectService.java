@@ -241,10 +241,10 @@ public class ProjectService {
         return ListProjectResponse.fromPage(projectsPage);
     }
 
-    public ProjectStatisticsResponse getProjectStatistics(UUID projectId, LocalDate from, Integer monthsNumber, HttpServletRequest servletRequest) {
+    public ProjectStatisticsResponse getProjectStatistics(UUID projectId, LocalDate from, Integer monthsPerUnit, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
-        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, from.withDayOfMonth(1), monthsNumber);
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, from.withDayOfMonth(1), monthsPerUnit);
 
         List<Person> people = personRepo.findAllByProjectId(projectId);
         Map<UUID, PersonDto> peopleMap = people.stream().collect(Collectors.toMap(Person::getId, PersonMapper.INSTANCE::toDto));
