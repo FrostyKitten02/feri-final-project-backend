@@ -2,6 +2,7 @@ package si.feri.itk.projectmanager.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,8 +26,8 @@ import java.util.UUID;
 public class WorkPackageController {
     private final WorkPackageService workPackageService;
     @PostMapping
-    public ResourceCreatedResponse createWorkPackage(@RequestBody CreateWorkPackageRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        UUID workPackageId = workPackageService.crateWorkPackage(servletRequest, request);
+    public ResourceCreatedResponse createWorkPackage(@RequestBody @Valid CreateWorkPackageRequest request, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+        UUID workPackageId = workPackageService.crateWorkPackage(request, servletRequest);
         servletResponse.setStatus(HttpServletResponse.SC_CREATED);
         ResourceCreatedResponse response = new ResourceCreatedResponse();
         response.setId(workPackageId);
@@ -39,7 +40,7 @@ public class WorkPackageController {
     }
 
     @PatchMapping("/{workPackageId}")
-    public void updateWorkPackage(@PathVariable UUID workPackageId, @RequestBody UpdateWorkPackageRequest request, HttpServletRequest servletRequest) {
+    public void updateWorkPackage(@PathVariable UUID workPackageId, @RequestBody @Valid UpdateWorkPackageRequest request, HttpServletRequest servletRequest) {
         workPackageService.updateWorkPackage(workPackageId, request, servletRequest);
     }
 

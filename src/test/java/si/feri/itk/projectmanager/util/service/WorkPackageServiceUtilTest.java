@@ -36,7 +36,7 @@ public class WorkPackageServiceUtilTest {
             WorkPackageServiceUtil.validateCreateWorkPackageRequest(request);
         });
 
-        request.setAssignedPM(0L);
+        request.setAssignedPM(-1L);
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
             WorkPackageServiceUtil.validateCreateWorkPackageRequest(request);
         });

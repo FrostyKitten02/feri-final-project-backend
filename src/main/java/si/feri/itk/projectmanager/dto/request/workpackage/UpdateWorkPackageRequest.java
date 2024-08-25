@@ -16,5 +16,6 @@ public class UpdateWorkPackageRequest implements IDuration {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isRelevant;
+    @Min(0)
     private Long assignedPM;
 }

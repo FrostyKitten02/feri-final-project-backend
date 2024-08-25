@@ -17,7 +17,7 @@ public class CreateWorkPackageRequest implements IDuration {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isRelevant;
-    @Min(1)
+    @Min(0)
     private Long assignedPM;
     private UUID projectId;
 }

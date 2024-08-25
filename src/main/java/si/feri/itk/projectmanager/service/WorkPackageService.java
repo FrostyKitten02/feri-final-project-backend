@@ -1,9 +1,11 @@
 package si.feri.itk.projectmanager.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import si.feri.itk.projectmanager.dto.common.Duration;
 import si.feri.itk.projectmanager.dto.common.IDuration;
 import si.feri.itk.projectmanager.dto.request.workpackage.CreateWorkPackageRequest;
@@ -26,7 +28,7 @@ public class WorkPackageService {
     private final TaskRepo taskRepo;
     private final ProjectRepo projectRepo;
     private final WorkPackageRepo workPackageRepo;
-    public UUID crateWorkPackage(HttpServletRequest servletRequest, CreateWorkPackageRequest request) {
+    public UUID crateWorkPackage(@Validated CreateWorkPackageRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
 
         WorkPackageServiceUtil.validateCreateWorkPackageRequest(request);
@@ -50,7 +52,7 @@ public class WorkPackageService {
         workPackageRepo.delete(workPackage);
     }
 
-    public void updateWorkPackage(UUID workPackageId, UpdateWorkPackageRequest request, HttpServletRequest servletRequest) {
+    public void updateWorkPackage(UUID workPackageId, @Validated UpdateWorkPackageRequest request, HttpServletRequest servletRequest) {
         final String userId = RequestUtil.getUserIdStrict(servletRequest);
         final Project project = projectRepo.findProjectByWorkPackageIdAndOwnerId(workPackageId, userId).orElseThrow(()->new ItemNotFoundException("Work package not found"));
         final WorkPackage workPackage = workPackageRepo.findById(workPackageId).orElseThrow(()->new ItemNotFoundException("Work package not found"));

@@ -19,7 +19,7 @@ public class WorkPackageServiceUtil {
     public static void validateUpdateWorkPackageRequest(UpdateWorkPackageRequest request) {
         DateUtil.validateDurationStrict(request);
 
-        if (request.getAssignedPM() != null && request.getAssignedPM() <= 0) {
+        if (request.getAssignedPM() != null && request.getAssignedPM() < 0) {
             throw new BadRequestException("Assigned PM must be a positive number");
         }
     }
@@ -82,7 +82,7 @@ public class WorkPackageServiceUtil {
             throw new BadRequestException("IsRelevant is required");
         }
 
-        if (request.getAssignedPM() == null || request.getAssignedPM() <= 0) {
+        if (request.getAssignedPM() == null || request.getAssignedPM() < 0) {
             throw new BadRequestException("Assigned PM is required, it must be a positive number");
         }
 
