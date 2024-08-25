@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonDto;
+import si.feri.itk.projectmanager.dto.model.person.PersonOnProjectDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.ProjectListSearchParams;
@@ -106,7 +107,7 @@ public class ProjectController {
 
     @GetMapping("/{projectId}/people")
     public GetPeopleResponse getPeopleOnProjectByProjectId(@PathVariable UUID projectId, HttpServletRequest servletRequest) {
-        List<PersonDto> people = personService.findPeopleOnProject(projectId, servletRequest);
+        List<PersonOnProjectDto> people = personService.findPeopleOnProject(projectId, servletRequest);
         GetPeopleResponse response = new GetPeopleResponse();
         response.setPeople(people);
         response.setProjectId(projectId);

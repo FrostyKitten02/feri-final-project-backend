@@ -137,7 +137,7 @@ public class ProjectServiceUtilTest {
         LocalDate date = LocalDate.now();
         PersonOnProject personOnProject = ProjectServiceUtil.createNewPersonOnProject(project, person, date, date, BigDecimal.ONE);
         Assertions.assertEquals(project.getId(), personOnProject.getProjectId());
-        Assertions.assertEquals(person.getId(), personOnProject.getPersonId());
+        Assertions.assertEquals(person.getId(), personOnProject.getPerson().getId());
         Assertions.assertEquals(BigDecimal.ONE, personOnProject.getEstimatedPm());
         Assertions.assertEquals(date, personOnProject.getFromDate());
         Assertions.assertEquals(date, personOnProject.getToDate());

@@ -14,6 +14,8 @@ import java.util.UUID;
 public interface PersonOnProjectRepo extends JpaRepository<PersonOnProject, UUID> {
     Optional<PersonOnProject> findFirstByProjectIdAndPersonId(UUID projectId, UUID personId);
 
+    List<PersonOnProject> findAllByProjectId(UUID projectId);
+
     @Modifying
     @Query("DELETE FROM PersonOnProject p " +
             "WHERE p.projectId = :projectId ")
@@ -22,7 +24,7 @@ public interface PersonOnProjectRepo extends JpaRepository<PersonOnProject, UUID
     //this should only delete one row
     @Modifying
     @Query("DELETE FROM PersonOnProject p " +
-            "WHERE p.personId = :personId " +
+            "WHERE p.person.id = :personId " +
             "AND p.projectId = :projectId ")
     void deleteAllByPersonIdAndProjectId(UUID personId, UUID projectId);
 }
