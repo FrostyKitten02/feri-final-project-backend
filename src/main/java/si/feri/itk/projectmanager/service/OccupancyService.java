@@ -6,14 +6,19 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import si.feri.itk.projectmanager.dto.model.MonthlyPersonOccupancyDto;
 import si.feri.itk.projectmanager.dto.request.occupancy.CreateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.request.occupancy.UpdateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.response.occupancy.CreateOccupancyResponse;
+import si.feri.itk.projectmanager.dto.response.occupancy.MonthlyPersonOccupancyResponse;
 import si.feri.itk.projectmanager.dto.response.occupancy.OccupancyWarning;
 import si.feri.itk.projectmanager.exceptions.implementation.IllegalResourceAccess;
 import si.feri.itk.projectmanager.exceptions.implementation.ItemNotFoundException;
+import si.feri.itk.projectmanager.mapper.MonthlyPersonOccupancyMapper;
+import si.feri.itk.projectmanager.model.MonthlyPersonOccupancy;
 import si.feri.itk.projectmanager.model.Occupancy;
 import si.feri.itk.projectmanager.model.person.PersonType;
+import si.feri.itk.projectmanager.repository.MonthlyPersonOccupancyRepo;
 import si.feri.itk.projectmanager.repository.OccupancyRepo;
 import si.feri.itk.projectmanager.repository.PersonOnProjectRepo;
 import si.feri.itk.projectmanager.repository.PersonRepo;
@@ -23,6 +28,7 @@ import si.feri.itk.projectmanager.util.RequestUtil;
 import si.feri.itk.projectmanager.util.service.OccupancyServiceUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +41,16 @@ public class OccupancyService {
     private final OccupancyRepo occupancyRepo;
     private final PersonTypeRepo personTypeRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
+    private final MonthlyPersonOccupancyRepo monthlyPersonOccupancyRepo;
+
+    public MonthlyPersonOccupancyResponse getMonthlyPersonOccupancy(LocalDate fromMonth, LocalDate toMonth, UUID personId) {
+        List<MonthlyPersonOccupancy> monthlyOccupancies = monthlyPersonOccupancyRepo.findAllByMonthIsBetweenAndPersonIdEquals(fromMonth, toMonth, personId);
+        List<MonthlyPersonOccupancyDto> monthlyOccupancyDto = monthlyOccupancies.stream().map(MonthlyPersonOccupancyMapper.INSTANCE::toDto).toList();
+
+        MonthlyPersonOccupancyResponse response = new MonthlyPersonOccupancyResponse();
+        response.setMonthlyPersonOccupancies(monthlyOccupancyDto);
+        return response;
+    }
 
     @Transactional
     public void deleteOccupancy(@NotNull UUID occupancyId, HttpServletRequest servletRequest) {
