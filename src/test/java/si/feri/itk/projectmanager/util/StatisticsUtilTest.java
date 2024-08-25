@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import si.feri.itk.projectmanager.dto.response.statistics.ProjectMonthDto;
+import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsUnitDto;
 import si.feri.itk.projectmanager.dto.response.statistics.ProjectStatisticsResponse;
 import si.feri.itk.projectmanager.model.project.Project;
 import si.feri.itk.projectmanager.model.Task;
 import si.feri.itk.projectmanager.model.WorkPackage;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,13 +66,83 @@ public class StatisticsUtilTest {
         BigDecimal totalPmMin = totalPM.multiply(BigDecimal.valueOf(98, 2));
         BigDecimal totalPmMax = totalPM.multiply(BigDecimal.valueOf(102, 2));
 
-        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project);
-        BigDecimal sum = stats.getMonths().stream().map(ProjectMonthDto::getPmBurnDownRate).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, null, null);
+        BigDecimal sum = stats.getUnits().stream().map(ProjectStatisticsUnitDto::getPmBurnDownRate).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
 
         Assertions.assertTrue(sum.compareTo(totalPmMin) > 0);
         Assertions.assertTrue(sum.compareTo(totalPmMax) < 0);
     }
 
+    @Test
+    public void testCreateProjectStatisticsWithCustomMonths() {
+        Project project = new Project();
+        WorkPackage wp = createWpWithTasks();
+        WorkPackage wp2 = createWpWithTasks2();
+        project.setTitle("Super title");
+        project.setEndDate(wp.getEndDate());
+        project.setStartDate(wp.getStartDate());
+        project.setWorkPackages(List.of(wp, wp2));
+        project.setStaffBudget(BigDecimal.valueOf(100000L));
+
+        BigDecimal totalPM = BigDecimal.valueOf(wp.getAssignedPM() + wp2.getAssignedPM());
+        //we allow 2% error!!
+        BigDecimal totalPmMin = totalPM.multiply(BigDecimal.valueOf(98, 2));
+        BigDecimal totalPmMax = totalPM.multiply(BigDecimal.valueOf(102, 2));
+
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, null, 3);
+        BigDecimal sum = stats.getUnits().stream().map(ProjectStatisticsUnitDto::getPmBurnDownRate).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+
+        Assertions.assertTrue(sum.compareTo(totalPmMin) > 0);
+        Assertions.assertTrue(sum.compareTo(totalPmMax) < 0);
+    }
+
+    @Test
+    public void testCreateProjectStatisticsWithCustomMonths2() {
+        Project project = new Project();
+        WorkPackage wp = createWpWithTasks();
+        WorkPackage wp2 = createWpWithTasks2();
+        project.setTitle("Super title");
+        project.setEndDate(wp.getEndDate());
+        project.setStartDate(wp.getStartDate());
+        project.setWorkPackages(List.of(wp, wp2));
+        project.setStaffBudget(BigDecimal.valueOf(100000L));
+
+        BigDecimal totalPM = BigDecimal.valueOf(wp.getAssignedPM() + wp2.getAssignedPM());
+        //we allow 2% error!!
+        BigDecimal totalPmMin = totalPM.multiply(BigDecimal.valueOf(98, 2));
+        BigDecimal totalPmMax = totalPM.multiply(BigDecimal.valueOf(102, 2));
+
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, null, 5);
+        BigDecimal sum = stats.getUnits().stream().map(ProjectStatisticsUnitDto::getPmBurnDownRate).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+
+        Assertions.assertTrue(sum.compareTo(totalPmMin) > 0);
+        Assertions.assertTrue(sum.compareTo(totalPmMax) < 0);
+    }
+
+
+    @Test
+    public void testCreateProjectStatisticsWithCustomStart() {
+        Project project = new Project();
+        WorkPackage wp = createWpWithTasks();
+        WorkPackage wp2 = createWpWithTasks2();
+        project.setTitle("Super title");
+        project.setEndDate(wp.getEndDate());
+        project.setStartDate(wp.getStartDate());
+        project.setWorkPackages(List.of(wp, wp2));
+        project.setStaffBudget(BigDecimal.valueOf(100000L));
+
+        BigDecimal totalPM = BigDecimal.valueOf(wp.getAssignedPM() + wp2.getAssignedPM())
+                .multiply(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(12), RoundingMode.DOWN); //we multiply by 10/12 because we skipped first 2 months
+        //we allow 2% error!!
+        BigDecimal totalPmMin = totalPM.multiply(BigDecimal.valueOf(98, 2));
+        BigDecimal totalPmMax = totalPM.multiply(BigDecimal.valueOf(102, 2));
+
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, LocalDate.parse("2021-03-01"), null);
+        BigDecimal sum = stats.getUnits().stream().map(ProjectStatisticsUnitDto::getPmBurnDownRate).reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+
+        Assertions.assertTrue(sum.compareTo(totalPmMin) > 0);
+        Assertions.assertTrue(sum.compareTo(totalPmMax) < 0);
+    }
     private List<Task> createTasks() {
         LocalDate startDate = LocalDate.parse("2021-01-01");
         LocalDate endDate = LocalDate.parse("2021-01-25");

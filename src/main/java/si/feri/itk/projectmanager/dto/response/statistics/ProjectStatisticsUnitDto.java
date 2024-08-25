@@ -1,7 +1,9 @@
 package si.feri.itk.projectmanager.dto.response.statistics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import si.feri.itk.projectmanager.dto.common.IDuration;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,13 +11,16 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProjectMonthDto {
+public class ProjectStatisticsUnitDto implements IDuration {
     //first day of the month
-    private LocalDate date;
-    private Integer monthNumber;
-    //how many pm-s to burn down this month
+    private LocalDate startDate;
+    //first day of the month
+    private LocalDate endDate;
+
+    private Integer unitNumber;
+    //how many pm-s to burn down this unit (example: in a month)
     private BigDecimal pmBurnDownRate = BigDecimal.ZERO;
-    //how much staff budget we can spend this month based on pmBurnDownRate
+    //how much staff budget we can spend this unit (example: this month) based on pmBurnDownRate
     private BigDecimal staffBudgetBurnDownRate = BigDecimal.ZERO;
 
     private BigDecimal actualTotalWorkPm = BigDecimal.ZERO;
@@ -27,16 +32,17 @@ public class ProjectMonthDto {
         this.pmBurnDownRate = this.pmBurnDownRate.add(burnDownRate);
     }
 
-    public void addStaffBudgetBurnDownRate(BigDecimal staffBudgetBurnDownRate) {
-        this.staffBudgetBurnDownRate = this.staffBudgetBurnDownRate.add(staffBudgetBurnDownRate);
-    }
-
     public void addWorkPm(BigDecimal workPm) {
         this.actualTotalWorkPm = this.actualTotalWorkPm.add(workPm);
     }
 
     public void addActualSpending(BigDecimal newSpending) {
         this.actualMonthSpending = this.actualMonthSpending.add(newSpending);
+    }
+
+    @JsonIgnore
+    public boolean isMonthUnit() {
+        return startDate.equals(endDate);
     }
 
 }
