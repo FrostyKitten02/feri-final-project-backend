@@ -244,7 +244,7 @@ public class ProjectService {
     public ProjectStatisticsResponse getProjectStatistics(UUID projectId, LocalDate from, Integer monthsPerUnit, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
         Project project = projectRepo.findByIdAndOwnerId(projectId, userId).orElseThrow(() -> new ItemNotFoundException("Project not found"));
-        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, from.withDayOfMonth(1), monthsPerUnit);
+        ProjectStatisticsResponse stats = StatisticUtil.calculateProjectStatistics(project, from, monthsPerUnit);
 
         List<Person> people = personRepo.findAllByProjectId(projectId);
         Map<UUID, PersonDto> peopleMap = people.stream().collect(Collectors.toMap(Person::getId, PersonMapper.INSTANCE::toDto));

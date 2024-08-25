@@ -65,7 +65,7 @@ public class StatisticUtil {
 
     private static LocalDate getStatisticsStartDate(Project project, LocalDate from) {
         if (from != null) {
-            return from;
+            return from.withDayOfMonth(1);
         }
 
         return project.getStartDate();
