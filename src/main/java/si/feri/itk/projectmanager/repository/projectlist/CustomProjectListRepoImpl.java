@@ -78,7 +78,7 @@ public class CustomProjectListRepoImpl extends QuerydslParent implements CustomP
             QPersonOnProject qPersonOnProject = QPersonOnProject.personOnProject;
             JPQLQuery<UUID> projectIdsSubquery = JPAExpressions.select(qPersonOnProject.projectId)
                     .from(qPersonOnProject)
-                    .where(qPersonOnProject.personId.eq(personIdSubquery));
+                    .where(qPersonOnProject.person.id.eq(personIdSubquery));
 
             projectIdRestrictions.or(qProjectList.id.in(projectIdsSubquery));
         }

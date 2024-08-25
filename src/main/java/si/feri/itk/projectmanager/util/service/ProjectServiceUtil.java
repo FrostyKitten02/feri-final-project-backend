@@ -188,7 +188,7 @@ public class ProjectServiceUtil {
 
     public static PersonOnProject createNewPersonOnProject(Project project, Person person, LocalDate from, LocalDate to, BigDecimal estimatedPm) {
         PersonOnProject personOnProject = new PersonOnProject();
-        personOnProject.setPersonId(person.getId());
+        personOnProject.setPerson(person);
         personOnProject.setProjectId(project.getId());
         personOnProject.setFromDate(from);
         personOnProject.setToDate(to);

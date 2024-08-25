@@ -16,7 +16,7 @@ public interface PersonRepo extends JpaRepository<Person, UUID> {
             "FROM Person AS p " +
             "WHERE p.id in " +
             "   (" +
-            "   SELECT pop.personId " +
+            "   SELECT pop.person.id " +
             "   FROM PersonOnProject AS pop " +
             "   WHERE pop.projectId = :projectId" +
             "   )")
