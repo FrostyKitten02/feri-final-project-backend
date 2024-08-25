@@ -15,6 +15,6 @@ import java.util.UUID;
 public class UpdateOccupancyRequest {
     private UUID occupancyId;
     @DecimalMax(value = "1.000")
-    @DecimalMin(value = "0.001")
+    @DecimalMin(value = "0")
     private BigDecimal value;
 }

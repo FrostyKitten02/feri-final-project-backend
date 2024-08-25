@@ -2,6 +2,7 @@ package si.feri.itk.projectmanager.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,7 +30,7 @@ public class OccupancyController {
     private final OccupancyService occupancyService;
 
     @PostMapping
-    public ResourceCreatedResponse addOccupancy(@RequestBody CreateOccupancyRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
+    public ResourceCreatedResponse addOccupancy(@RequestBody @Valid CreateOccupancyRequest request, HttpServletResponse servletResponse, HttpServletRequest servletRequest) {
         CreateOccupancyResponse response = occupancyService.addOccupancy(request, servletRequest);
         if (response != null && response.getIds() != null && !response.getIds().isEmpty()) {
             servletResponse.setStatus(HttpServletResponse.SC_CREATED);
@@ -39,7 +40,7 @@ public class OccupancyController {
 
 
     @PatchMapping
-    public void updateOccupancy(@RequestBody UpdateOccupancyRequest request, HttpServletRequest servletRequest) {
+    public void updateOccupancy(@RequestBody @Valid UpdateOccupancyRequest request, HttpServletRequest servletRequest) {
         occupancyService.updateOccupancy(request, servletRequest);
     }
 

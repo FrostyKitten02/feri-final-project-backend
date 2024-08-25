@@ -22,7 +22,7 @@ public class CreateOccupancyRequest implements IDuration {
     private LocalDate toMonth;
 
     @DecimalMax(value = "1.000")
-    @DecimalMin(value = "0.001")
+    @DecimalMin(value = "0")
     private BigDecimal value;
 
      @JsonIgnore

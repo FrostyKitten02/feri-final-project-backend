@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import si.feri.itk.projectmanager.dto.request.occupancy.CreateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.request.occupancy.UpdateOccupancyRequest;
 import si.feri.itk.projectmanager.dto.response.occupancy.CreateOccupancyResponse;
@@ -47,7 +48,7 @@ public class OccupancyService {
 
 
     @Transactional
-    public void updateOccupancy(UpdateOccupancyRequest request, HttpServletRequest servletRequest) {
+    public void updateOccupancy(@Validated UpdateOccupancyRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
 
         OccupancyServiceUtil.validateUpdateOccupancyRequest(request);
@@ -60,7 +61,7 @@ public class OccupancyService {
     }
 
     @Transactional
-    public CreateOccupancyResponse addOccupancy(CreateOccupancyRequest request, HttpServletRequest servletRequest) {
+    public CreateOccupancyResponse addOccupancy(@Validated CreateOccupancyRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
 
         OccupancyServiceUtil.validateCreateOccupancyRequest(request);
