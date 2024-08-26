@@ -30,7 +30,7 @@ public class PersonController {
     private final SalaryService salaryService;
 
     @GetMapping("/current")
-    public GetPersonResponse geCurrentPerson(HttpServletRequest servletRequest) {
+    public GetPersonResponse getCurrentPerson(HttpServletRequest servletRequest) {
         PersonDto person = personService.getCurrentPerson(servletRequest);
         SalaryDto salary = salaryService.getPersonCurrentSalary(person.getId());
 
