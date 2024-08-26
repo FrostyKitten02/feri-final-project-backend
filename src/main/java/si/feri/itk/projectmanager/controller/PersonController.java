@@ -29,6 +29,17 @@ public class PersonController {
     private final PersonService personService;
     private final SalaryService salaryService;
 
+    @GetMapping("/current")
+    public GetPersonResponse geCurrentPerson(HttpServletRequest servletRequest) {
+        PersonDto person = personService.getCurrentPerson(servletRequest);
+        SalaryDto salary = salaryService.getPersonCurrentSalary(person.getId());
+
+        GetPersonResponse response = new GetPersonResponse();
+        response.setPerson(person);
+        response.setCurrentSalary(salary);
+        return response;
+    }
+
     @GetMapping("/{personId}")
     public GetPersonResponse getPersonById(@PathVariable UUID personId, HttpServletRequest servletRequest) {
         PersonDto person = personService.getPersonById(personId);
