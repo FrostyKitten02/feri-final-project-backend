@@ -1,0 +1,1 @@
+alter table person add column is_admin boolean default false;

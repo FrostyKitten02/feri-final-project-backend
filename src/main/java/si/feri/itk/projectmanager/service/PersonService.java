@@ -34,6 +34,13 @@ public class PersonService {
     private final ProjectRepo projectRepo;
     private final PersonOnProjectRepo personOnProjectRepo;
     private final PersonListRepo personListRepo;
+
+    public PersonDto getCurrentPerson(HttpServletRequest servletRequest) {
+        String userId = RequestUtil.getUserIdStrict(servletRequest);
+        Person person = personRepo.findByClerkId(userId).orElseThrow(() -> new ItemNotFoundException("Person not found"));
+        return PersonMapper.INSTANCE.toDto(person);
+    }
+
     public PersonDto getPersonById(UUID personId) {
         return personRepo.findById(personId).map(PersonMapper.INSTANCE::toDto).orElseThrow(() -> new ItemNotFoundException("Person not found"));
     }

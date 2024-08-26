@@ -17,4 +17,5 @@ public class PersonDto {
     private String name;
     private String lastname;
     private String email;
+    private boolean isAdmin;
 }
