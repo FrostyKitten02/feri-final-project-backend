@@ -15,6 +15,6 @@ public interface PersonMapper {
     PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
     PersonDto toDto(Person person);
     PersonListDto toDto(PersonList personList);
-    @Mapping(target = "id", source = "personOnProject.id", ignore = true)
+    @Mapping(target = "id", source = "person.id")
     PersonOnProjectDto toDto(Person person, PersonOnProject personOnProject);
 }
