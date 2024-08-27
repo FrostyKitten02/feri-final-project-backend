@@ -105,7 +105,7 @@ public class OccupancyService {
         List<OccupancyWarning> warnings = new ArrayList<>(newlyAdded.size());
         for (Occupancy occupancy : newlyAdded) {
             BigDecimal sum = occupancyRepo.sumAllByMonthAndPersonId(occupancy.getMonth(), occupancy.getPersonId());
-            PersonType personType = personTypeRepo.findByStartDateBeforeAndEndDateNullOrAfter(occupancy.getMonth());
+            PersonType personType = personTypeRepo.findByStartDateBeforeAndEndDateNullOrAfterAndPersonId(occupancy.getMonth(), occupancy.getPersonId());
 
             if (personType != null && personType.getMaxAvailability().compareTo(sum) > 0) {
                 continue;

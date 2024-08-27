@@ -10,8 +10,9 @@ import java.util.UUID;
 public interface PersonTypeRepo extends JpaRepository<PersonType, UUID> {
 
     @Query("SELECT pt FROM PersonType pt " +
-            "WHERE pt.startDate <= :date " +
+            "WHERE pt.personId = :personId " +
+            "AND pt.startDate <= :date " +
             "AND (pt.endDate IS NULL OR pt.endDate >= :date)")
-    PersonType findByStartDateBeforeAndEndDateNullOrAfter(LocalDate date);
+    PersonType findByStartDateBeforeAndEndDateNullOrAfterAndPersonId(LocalDate date, UUID personId);
 
 }
