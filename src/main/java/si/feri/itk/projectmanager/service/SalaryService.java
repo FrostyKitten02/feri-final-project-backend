@@ -57,7 +57,7 @@ public class SalaryService {
     public UUID addSalaryToPerson(CreateSalaryRequest request, HttpServletRequest servletRequest) {
         String userId = RequestUtil.getUserIdStrict(servletRequest);
 
-        Person person = personRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new UnauthorizedException("User not found"));
+        Person person = personRepo.findByClerkId(userId).orElseThrow(() -> new UnauthorizedException("User not found"));
         if (!person.isAdmin()) {
             throw new UnauthorizedException("Permission denied");
         }
