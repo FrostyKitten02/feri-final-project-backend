@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import si.feri.itk.projectmanager.dto.model.ProjectDto;
 import si.feri.itk.projectmanager.dto.model.ProjectFileDto;
-import si.feri.itk.projectmanager.dto.model.person.PersonDto;
 import si.feri.itk.projectmanager.dto.model.person.PersonOnProjectDto;
 import si.feri.itk.projectmanager.dto.request.project.AddPersonToProjectRequest;
 import si.feri.itk.projectmanager.dto.request.project.CreateProjectRequest;
@@ -46,6 +45,7 @@ import si.feri.itk.projectmanager.service.PersonService;
 import si.feri.itk.projectmanager.service.ProjectService;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,6 +114,14 @@ public class ProjectController {
         return response;
     }
 
+    @GetMapping("/{projectId}/people/perso/{personId}")
+    public GetPeopleResponse getPersonOnProject(@PathVariable UUID projectId, @PathVariable UUID personId, HttpServletRequest servletRequest) {
+        PersonOnProjectDto person = personService.getPersonOnProject(projectId, personId, servletRequest);
+        GetPeopleResponse response = new GetPeopleResponse();
+        response.setPeople(Collections.singletonList(person));
+        response.setProjectId(projectId);
+        return response;
+    }
 
     @GetMapping("/list")
     public ListProjectResponse listProjects(
@@ -139,8 +147,6 @@ public class ProjectController {
     public ProjectListStatusResponse listProjectsStatus(HttpServletRequest servletRequest) {
         return projectService.listProjectsStatus(servletRequest);
     }
-
-
 
     @RequestMapping(
             path = "{projectId}/upload-file",
