@@ -14,6 +14,7 @@ public class PersonUtil {
         person.setName(clerkUser.getFirstName());
         person.setLastname(clerkUser.getLastName());
         person.setClerkId(clerkUser.getId());
+        person.setProfileImageUrl(clerkUser.getImageUrl());
     }
 
     public static Person createNewPersonFromClerkUser(ClerkUser clerkUser) {
@@ -21,6 +22,7 @@ public class PersonUtil {
         person.setClerkId(clerkUser.getId());
         person.setName(clerkUser.getFirstName());
         person.setLastname(clerkUser.getLastName());
+        person.setProfileImageUrl(clerkUser.getImageUrl());
         final String email = getEmailFromClerkUser(clerkUser);
         if (StringUtil.isNullOrEmpty(email)) {
             throw new BadRequestException("Email not found on create user clerk webhook event");
@@ -48,6 +50,7 @@ public class PersonUtil {
     public static void updateExistingPersonWithClerkUser(Person person, ClerkUser clerkUser) {
         person.setName(clerkUser.getFirstName());
         person.setLastname(clerkUser.getLastName());
+        person.setProfileImageUrl(clerkUser.getImageUrl());
         final String email = getEmailFromClerkUser(clerkUser);
         if (StringUtil.isNullOrEmpty(email)) {
             throw new BadRequestException("Email not found on updated user clerk webhook event");
@@ -57,5 +60,6 @@ public class PersonUtil {
 
     public static void updatePersonDeletedUser(Person person) {
         person.setClerkId(null);
+        person.setProfileImageUrl(null);
     }
 }

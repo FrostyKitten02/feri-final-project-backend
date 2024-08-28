@@ -14,6 +14,8 @@ import si.feri.itk.projectmanager.dto.clerk.UserUpdatedEvent;
 import si.feri.itk.projectmanager.service.ClerkService;
 import si.feri.itk.projectmanager.util.ClerkEventUtil;
 
+import java.util.Map;
+
 
 @Slf4j
 @CrossOrigin

@@ -17,6 +17,7 @@ public class PersonList {
     private String name;
     private String lastname;
     private String email;
+    private String profileImageUrl;
 
     //list extras
     private BigDecimal salary;

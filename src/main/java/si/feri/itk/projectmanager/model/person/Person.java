@@ -13,5 +13,6 @@ public class Person extends BaseModel {
     private String lastname;
     private String email;
     private String clerkId;
+    private String profileImageUrl;
     private boolean isAdmin;
 }
