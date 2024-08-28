@@ -114,7 +114,7 @@ public class ProjectController {
         return response;
     }
 
-    @GetMapping("/{projectId}/people/person/{personId}")
+    @GetMapping("/{projectId}/person/{personId}")
     public GetPeopleResponse getPersonOnProject(@PathVariable UUID projectId, @PathVariable UUID personId, HttpServletRequest servletRequest) {
         PersonOnProjectDto person = personService.getPersonOnProject(projectId, personId, servletRequest);
         GetPeopleResponse response = new GetPeopleResponse();
