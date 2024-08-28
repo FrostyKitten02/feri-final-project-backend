@@ -23,6 +23,10 @@ public class ClerkUser {
     @Setter(onMethod = @__(@JsonProperty("primary_email_address_id")))
     private String primaryEmailAddressId;
 
+    @Getter(onMethod = @__(@JsonProperty("image_url")))
+    @Setter(onMethod = @__(@JsonProperty("image_url")))
+    private String imageUrl;
+
     @Getter(onMethod = @__(@JsonProperty("email_addresses")))
     @Setter(onMethod = @__(@JsonProperty("email_addresses")))
     private List<EmailAddress> emailAddresses;

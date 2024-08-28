@@ -18,6 +18,7 @@ public class PersonListDto {
     private String name;
     private String lastname;
     private String email;
+    private String profileImageUrl;
 
     private BigDecimal salary;
     private BigDecimal availability;
