@@ -42,7 +42,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secretes.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT }}
           source: target/updated.jar
           target: /opt/steer/backend/
 
@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secretes.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT }}
           envs: PASSWORD
           script: |
             cd /opt/steer/backend
