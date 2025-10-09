@@ -34,7 +34,7 @@ jobs:
         run: mvn -B package -Dspring.config.location=src/main/resources/ci-application.properties --file pom.xml
 
       - name: Rename jar
-        run: cp target/*.jar target/updated.jar
+        run: cp target/*.jar updated.jar
         
       - name: Upload files to server
         uses: appleboy/scp-action@v0.1.7
@@ -58,7 +58,7 @@ jobs:
           envs: PASSWORD
           script: |
             cd /opt/steer/backend
-            docker compose down steer-ws && [ -f updated.jar ] && 
+            docker compose down steer-ws && [ -f target/updated.jar ] && 
             rm app.jar &&
-            mv updated.jar app.jar
+            mv target/updated.jar app.jar && rm -rf target
             docker compose up steer-ws -d
