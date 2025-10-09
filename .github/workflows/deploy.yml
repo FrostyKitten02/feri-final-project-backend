@@ -34,7 +34,7 @@ jobs:
         run: mvn -B package -Dspring.config.location=src/main/resources/ci-application.properties --file pom.xml
 
       - name: Rename jar
-        run: cp target/*.jar updated.jar
+        run: cp target/*.jar target/updated.jar
         
       - name: Upload files to server
         uses: appleboy/scp-action@v0.1.7
